@@ -1,0 +1,40 @@
+AI = umělá inteligence (věda)
+ML = strojové učení (sada nástrojů, podmnožina AI)
+	1) učení s učitelem = práce s předem označenými daty (toto je kočka, toto je pes...)
+		a) klasifikace = používá klasifikaci jedné z tříd pomocí klasifikátorů
+		b) regrese = používá spojité proměnné (nikoliv daný počet tříd, ale až nekonečné množství možností)
+	2) učení bez učitele = na vstupu dám pouze data, na výstupu vidím seskupení do shluků (zde hledám souvislosti)
+	3) učení s odměnem a trestem (používá se často u her)
+
+1a)
+algoritmy - klasifikátory
+	.1) Knn (K-najbližších susedov)
+	.2) Random forest
+	.3) Decision tree classifier
+	.4) Logistic regression
+
+1a1) Knn (K-najbližších susedov)
+
+pip install seaborn
+
+cd C:\Users\vecko\naucse-python\misohu\kurz-strojoveho-ucenia-main
+.venv\analytics\Scripts\activate
+jupyter lab
+
+import pandas as pd 
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score, accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix, plot_confusion_matrix, ConfusionMatrixDisplay
+
+
+plt.figure(figsize=(10, 10))
+sns.scatterplot(data=target_df, x="MonthlyIncome", y="TotalWorkingYears", hue="Attrition")
+
+pred=    [1,1,1,1,1,0,0,0,0,0]
+reality= [1,0,1,1,1,1,0,0,0,0]
+
+cm=confusion_matrix(reality, pred)
+disp=ConfusionMatrixDisplay(cm)
+disp.plot()
+

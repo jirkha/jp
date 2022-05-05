@@ -1,0 +1,50 @@
+AKTIVACE PTHONU V PŘÍKAZOVÉM ŘÁDKU:
+1) cd naucse-python
+2) venv\Scripts\activate
+3) python
+
+PRO UKONČENÍ:
+deactivate 
+
+GIT BASCH
+cd ~/naucse-python/misohu/... = přejde do složky "misohu"
+pwd = vypíše celou cestu do aktuální složky
+ls = vypíše seznam souborů v aktuální složce
+ls -la = vypíše seznam souborů v aktuální složce s podrobnostmi
+rm = výmaz
+mkdir .venv = vytvoří novou složku "venv"
+pip list = ukáže seznam aktivních knihoven
+python -m venv .venv/drf = vytvoří nové virtuální prostředí s názvem "drf" ve složce "venv"
+source .venv/drf/Scripts/activate = aktivuje vybrané virtuální prostředí
+deactivate = ukončení virtuálního prostředí
+
+GIT:
+git init = inicializace gitu ve VScode
+git status = zjistí stav
+git add "název_souboru1.xyz" "název_souboru2.xyz" = uložení změn do meziprostoru gitu (bez uvozovek)
+git add . = uloží do meziprostoru vše
+git commit -m "Sem napíšu popis změny" = přesun na místní uložiště s popisem revize (v uvozovkách)
+git reset HEAD = vrátí zpět změny v meziprostoru
+git reset --hard = vymaže vše v meziprostoru
+git checkout . = vrátí zpět poslední změny
+git rm "název_souboru.xyz" = vymaže zadaný soubor (bez uvozovek)
+git mv "aktuální_název.xyz" "nový_název.xyz" = přejmenování souboru
+git log --oneline = ukáže stručný seznam změn
+git branch "nová_větev" = vytvoří novou větev a pojmenuje jí (bez uvozovek)
+git checkout "nová_větev" = přepnutí do jiné větve (bez uvozovek)
+git merge "nová větev" = spojí změny z "nové_větve" do master větve
+git remote -v = ukáže vzdáleně uložené verze na githubu, pokud jsou
+git push -u origin main = pošle (zálohuje) aktuální branch z místního na vzdálené uložiště
+
+
+gitk --all   # graficky zobrazí změn
+
+
+TAHÁK NA KLÁVESNICI:
+https://pyvec.github.io/cheatsheets/keyboard/keyboard-cs.pdf
+
+Visual studio code:
+cls = vymaže obsah terminálu
+ctrl+c = zastaví donekonečna se opakující cyklus v terminálu (běžícím programu)
+ctrl+[ = odsune označenou část kódu doleva (o úroveň níže)
+ctrl+] = odsune označenou část kódu doprava (o úroveň výše)

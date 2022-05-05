@@ -1,0 +1,108 @@
+GET - dotaz
+POST - vytvoření (umístění)
+PUT - editace (úprava, změna)
+DELETE - vymazání
+
+---
+
+GIT BASCH
+cd ~/naucse-python/misohu/... = přejde do složky "misohu"
+pwd = vypíše celou cestu do aktuální složky
+ls = vypíše seznam souborů v aktuální složce
+ls -la = vypíše seznam souborů v aktuální složce s podrobnostmi
+rm = výmaz
+mkdir .venv = vytvoří novou složku "venv"
+pip list = ukáže seznam aktivních knihoven
+python -m venv .venv/drf = vytvoří nové virtuální prostředí s názvem "drf" ve složce "venv"
+source .venv/drf/Scripts/activate = aktivuje virtuální prostředí
+source ~/naucse-python/misohu/django-tutorial-main/drf/.venv/drf/Scripts/activate = aktivuje vybrané virtuální prostředí
+deactivate = ukončení virtuálního prostředí
+code . = přejde do Visual Studio Code
+
+DJANGO 
+pip install django = instalace djanga
+pip install ipython = instalace doplňku k pythonu
+django-admin startproject school_project = vytvoří nový projekt s názvem "school_project"
+python manage.py startapp school_app = vytvoří nový projekt (aplikaci) s názvem "school_app"
+python manage.py runserver = spustí project v djangu (musím být umístěn ve složce se souborem "mamage.py")
+python manage.py makemigrations = vytvoří migrační soubor (proces před vytvořením tabulky)
+python manage.py migrate = provede migraci v každé z INSTALLED_APPS (vytvoří tabulku)
+python manage.py migrate school_app 0001_initial = vrátí zpět migraci 0001 v apk school_app
+python manage.py shell = spustí django shell
+
+
+DJANGO+SQLITE	
+from school_app.models import Subject
+Subject.objects.all()
+subject = Subject(name="Physics", abbrev="Ph")
+subject.save()
+Subject.objects.get(pk=1)
+Subject.objects.filter(name__startswith="M")
+models.Subject.objects.all()
+models.Subject.objects.values() = vrátí list uložených objektů
+models.Subject.objects.get(pk=1).__dict__
+
+DJANGO+SQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'school',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+pip install psycopg2
+
+
+
+---
+Python
+
+python -m http.server 9000 = spustí v Pythonu http server na portu 9000
+http://localhost:8080/ = localhost v Google Chrome
+
+---
+
+Stavové kódy odpovědi HTTP (Statuc code)
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+1xx - Request in progress
+2xx - Everything is ok
+3xx - Požadavek přesměrován
+4xx - Chyba na straně klienta (požadavatele)
+5xx - Chyba na straně serveru
+
+---
+
+JSON
+
+{
+	"Students": [{
+		"name": "J.V.",
+		"age": 12,
+		"class": 1,
+		"subjects": [{
+				"name": "AJ",
+				"teacher": "J.P."
+			},
+			{
+				"name": "ČJ",
+				"teacher": "V.J."
+			}
+		]
+	}, {
+		"name": "E.Š.",
+		"age": 15,
+		"class": 1,
+		"subjects": [{
+				"name": "NJ",
+				"teacher": "A.H."
+			},
+			{
+				"name": "ČJ",
+				"teacher": "V.J."
+			}
+		]
+	}]
+}

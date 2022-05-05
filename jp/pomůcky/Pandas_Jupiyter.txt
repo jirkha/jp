@@ -1,0 +1,292 @@
+SPUŠTĚNÍ
+
+cd C:\Users\vecko\naucse-python\misohu\data_analytics
+.venv\analytics\Scripts\activate
+jupyter lab
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from datetime import datetime as dt
+%matplotlib inline
+
+
+JUPYTER
+
+shift+enter = spustí aktuální buňku a označí následující
+ctrl+enter = spustí aktuální buňku a zůstane na ní
+
+df = pd.read_csv("data/iris.csv", sep=";") # read_csv sluzi na nacitanie dat z csv suboru do pandas dataframu
+	sep specifikuje oddělovač sloupců
+	skiprows přeskočí 1. řádek
+	encoding='latin1' nebo 'utf-8'
+
+files = glob.glob("dataset/*")  # načte všechny soubory ve složce "dataset" a uloží je do proměnné "files"
+glob.glob("dataset/*.csv")  # načte pouze csv soubory - slouží k načtení více souborů csv najednou
+
+df  # zobrazí celý dataframe (nebo alepoň první a poslední řádky a informaci o velikosti tabulky)
+df.tail()  # tail vypisuje poslednych 5 riadkov dataframu
+df.head()  # head vypisuje prvních 5 riadkov dataframu
+df."název sloupce"  # vypíše pouze zadaný sloupec (bez uvozovek)
+df."název sloupce".hist(bins=30)  # vykreslí histogram zadané hodnoty rozdělení do 30 sloupců (bez uvozovek)
+
+df = pd.DataFrame(1, index=["a", "b"], columns=[1, 2])  
+	# vytvoří tabulku obsahující 1 s danými sloupci a řádky
+df1 = pd.DataFrame( data = {"a": [1,2,3,4], "b": [5,6,7,8], "c": [9,10,11,12]}, index = [1,2,3,4])
+	# vytvoří tabulku
+
+df = pd.DataFrame(data = {
+    ("bus","bus1"): np.arange(1,5),
+    ("vlak","vlak1"): np.arange(6,10),
+    ("vlak","vlak2"): np.arange(6,10),
+},  index = [1,2,3,4])     # vytvoří tabulku se slovníkem
+df.loc[:3,("vlak","vlak1")]  # přístup na jednotlivou úroveň (přes touple)
+
+df.shape  # vracia rozměr dataframu
+df.columns  # vrati názvy sloupců dataframu
+df.size  # vrati pocet buněk v dataframu
+df.values  # vrátí obsah df ve formátu numpy pole
+pd.Series([1,2,3], index=["a", "b", "c"])  
+	# Series je jako jeden sloupec v dataframu, který je tvoreny hodnotami a indexom
+df.to_frame()  # zobrazí df ve fromátu DataFrame
+df.describe()  # vypíše statistiku ze sloupců (rozlišuje mezi sloupci s číslenými a textovými hodnotami)
+
+df.MSSubClass "název sloupce"  # zobrazí zadaný sloupec ve formátu pandas series kde index je ronaky ak bol v dataframe
+df["MSSubClass"]  # alternativa k předchozímu
+df[["MSSubClass"]]  # vystupom je pandas dataframe aj ked je tam len jeden stlpec
+df[["MSSubClass", "MSZoning"]]  # zobrazí více řádků (názvy zadávám v libovolném pořadí)
+
+target_columns = ["MSSubClass", "MSZoning"]
+df[target_columns]
+# Pole nazvov stlpcov si vieme vyclenit do pomocnej premennej pre zvysenie prehladnosti
+
+# & - and
+# | - or
+# ~ - not
+df[(df.SalePrice > 175000) & (df.SalePrice < 223500)]
+df[~((df.SalePrice > 175000) & (df.SalePrice < 223500))]
+# Kazda osobitna podmienka musi byt vo vlastnych zatvorkach !!!!
+
+
+LOC / ILOC
+df1.loc[[1,2], "a"]  # vypíše řádky s názvem 1 a 2 a sloupec s názvem a (bere v potaz hodnoty)
+df.iloc[:20,25:]  # vypíše prvních 20 řádků a sloupec 26 a více (bere v potaz indexy)
+df.loc[(df.LotFrontage >= 68) & (df.LotArea == 11250), ["LotArea","LotFrontage"]]
+df.loc[(df.SalePrice > 181500) & (df.MSSubClass > 30), :]
+#  VŽDY UPŘEDNOSTŇOVAT LOG A ILOG PŘED HRANATÝMI ZÁVORKAMI
+
+df.T_ID = list(range(0,11))  # nahradí hodnoty ve sloupci T_ID čísly od 0 do 10
+df.T_ID = pd.Series(list(range(0,11)))  # alternativa k předchozímu s tím, že u hodnot mimo rozsah se dopní NaN (None)
+
+df.loc[df.P_ID>8000, "P_ID"]=0  # nahradí hodnoty vyšší než 800 ve sloupci P_ID nulou
+
+df["d"] = range(0,10) # přidám nový sloupec "d", který bude obsahovat hodnoty 0 až 9
+
+
+Spojování dataframů (tabulek)
+
+pd.concat([df1,df2])  # vloží df2 pod df1
+pd.concat([df1,df2],axis=1)  # vloží df2 vedle df1
+pd.concat([df1,df2],join="inner")  # vrátí pouze sloupce, které jsou v tabulkách df1 i df2 (df2 vloží pod df1)
+pd.concat([df1,df2],join="inner",axis=1)  # vrátí pouze řádky, které jsou v tabulkách df1 i df2 (df2 vloží vedle df1)
+
+df1.join(df2, lsuffix="a")  # vloží df2 vedle df1 a přidá k indexu df1 (lsuffix=left) znak "a"
+df1.join(df2, rsuffix="a")  # vloží df2 vedle df1 a přidá k indexu df2 (rsuffix=right) znak "a"
+df1.join(df2, lsuffix="_", how="right")  # viz výše ale ponechá pouze řádky obsažené v df1 i df2
+
+df.reset_index()  # resetuje indexy (nastaví nové od 0 do x) a původní indexy dá do nového sloupce
+df.reset_index(drop=1)  # resetuje indexy (nastaví nové od 0 do x) a původní indexy smaže
+df.reset_index(drop=1, inplace=True) # # resetuje indexy (nastaví nové od 0 do x) a přepíše df na novou podobu
+
+
+NaN hodnoty
+
+any(df.Alley.notna())  # Prikaz zisti ci sa v stlpci nachadza aspon jedna NaN hodnota
+all(df.Alley.notna())  # Prikaz zisti ci sa v stlpci nachadzaju len NaN hodnoty 
+
+df.dropna()  # Vymaže všechny řádky, ve kterých je alespoň jedna NaN hodnota
+df.dropna(axis=1)  # Vymaže všechny sloupce, ve kterých je alespoň jedna NaN hodnota
+df.dropna(how="all")  # Vymaže všechny řádky, ve kterých jsou pouze NaN hodnoty 
+df.dropna(how="all", axis=1)  # Vymaže všechny sloupce, ve kterých jsou pouze NaN hodnoty
+
+# Mazanie riadkov kde su NaN hodnoty na zaklade dvoch stlpcov
+target_columns = df.loc[:, ["Alley" , "Fence"]]
+row_mask = target_columns.notna().apply(any, axis=1) # maska ktoru aplikujem v locu
+df.loc[row_mask, :]
+
+
+Iterace
+
+list(df1.iteritems())  # zobrazí iterace přes jednotlivé prvky
+
+for index, rows in df1.iteritems():
+    print(f"Index is {index} and rows are {rows}.")  # vypíše indexy a řádky
+
+for index, row in df1.iterrows():
+    df1.loc[index, "a"]=0  # vynuluje sloupec a
+
+df1.apply(np.sqrt)  # odmocní všechny hodnoty v df1
+df1.loc[:,"a"].apply(np.sqrt)  # odmocní všechny hodnoty ve sloupci a
+
+def funkce(a,b,c):
+    a.b=0
+    a.c=a.c - 10
+    return a
+df1.apply(funkce, args=("b","c"), axis=1)
+
+
+Group by
+
+list(df.groupby("název_sloupce"))  # vypíše hodnoty rozdělené dle hodnot v zadaném sloupci
+df.groupby("a").mean()  # vypíše průměrné hodnoty seskupené dle dohnot ve sloupci a
+df.groupby(["H_region","H_ID"]).mean()  # vypíše průměrné hodnoty seskupené dle dohnot ve sloupcích "H_region" a "H_ID" (zprava doleva)
+df.groupby(["Prostředek","Jednotka"],as_index=False,sort=True).count()  # spočítá množství daných hodnot v určených sloupcích; as_index dá do jedné úrovně všchny indexy => důležité!; sort=True seřadí hodnoty dle abecedy (resp. dle hodnot)
+
+
+x=tdf.groupby("H_region")  # uloží do proměnné x skupiny hodnot ve sloupci "H_region"
+x.get_group("Hlavní město Praha")  # ze skupin hodnot x udělá tabulku pouze s řádky, kde je v daném sloupci hodnota Hlavní město Praha"
+
+def průměr(group):
+    return (group.LotFrontage+group.LotArea).mean()
+df.groupby(["MSZoning"]).apply(průměr)  # spočítá průměr součtu hodnot LotFrontage+LotArea seskupený dle "MSZoning"
+
+
+Vizualizace
+
+df.SalePrice.plot()  # vykreslí graf z hodnot ve sloupci SalePrice
+df[["a","b"]].plot()  # vykreslí graf z hodnot ve sloupcích a,b
+df.SalePrice.plot(figsize=(20,6))  # zvětší graf na zadanou velikost v palcích
+df.SalePrice.hist()  # zobrazí histogram (sloupcový graf) z hodnot ve sloupci SalePrice
+df.SalePrice.hist(bins=150)  # nastaví podobnost (počet sloupců)
+
+
+Práce s textem
+
+df_texts = df.loc[:,df.dtypes == np.object]  # vyfiltrování sloupců s textem (typ object)
+df_texts.astype('string')  # konvertování z typu object na typ stringArray
+df_texts.str.lower()  # všechna písmena malá (vzdy se musí použít .str před samotnou metodou)
+df_texts.str.upper()  # všechna písmena velká
+df_texts.str.len()  #  # vypíš počet písmen
+df.columns.str.upper()  # u názvu sloupců všechna písmena velká
+
+df.columns.str.lower().str.replace('a', 'misko') 
+	# u názvů sloupců velká písmena a následně nahraď všechna "a" písmeny "misko"
+
+df.str.split("_")  # rozdělí řetežec oddělený "_" na dva řetežce v poli oddělené čárkou
+df.str.split("_", expand=True)  # rozdělí řetežec oddělený "_" do 2 samostaných sloupců
+df.groupby(["Rok"],as_index=False).mean().Rok.str.cat(sep=", ")
+	# seskupí hodnoty ve sloupci Rok a následně je vypíše a oddělí čárkou a mezerou
+df.groupby(["Rok"],as_index=False).mean().Rok.str.strip().values
+	# seskupí hodnoty ve sloupci Rok a umístí je do pole
+string_series.str.cat(string_series2)  # spojí dohromady hodnoty dvou sloupců Series
+string_series.str.contains("Hucko")  # vrátí informaci True/False, zda je ve sloupci Series obsaženo "Hucko"
+
+
+Operace s časem
+
+# 1) DATUMY: Date times (Python) => Timestamp (Pandas) - dtype datetime64[ns]
+# 2) ROZDÍLY MEZI DATUMY (ČASY): Time deltas (Python) => Timedelta (Pandas) - dtype timedelta64[ns]
+
+1) DATUMY
+
+# Datetime sa pouziva na reprezentaciu datumu a casu v pythone. V pandase sa oznacuje pojmom timestamp ale python vie pracovat aj s objektami typu datetime.
+now = dt.now()  # do proměnné now uloží aktuální čas
+now.second  # vypíše sekundy z času uloženého v proměnné now
+
+# Timestamp - Pandasov timestamp je zalozeny na efektivnejsom datovom type numpy.datetime64 (datetime64[ns]). V pandase preto pracujeme s typom timestamp nie datetime !!!
+now_timestamp = pd.Timestamp(now)
+	# konverze datetime proměnné now (většinou hodnota z Pythonu) do formátu timestamp
+
+timestamp = pd.Timestamp(year=2020, month=6, day=9, hour=8, minute=30, second=20, microsecond=79, nanosecond=99, tz="Europe/Bratislava")
+	# manuální zadání přesného času ve formátu timestamp
+pd.Timestamp('2019-8-1'))  # 2019-08-01 00:00:00
+pd.Timestamp(2020, 6, 9, 12)  # 2020-06-09 12:00:00
+pd.Timestamp('August 9, 2020 13:45')  # 2020-08-09 13:45:00
+pd.Timestamp('2020-01-01T14')  # 2020-01-01 14:00:00
+pd.Timestamp(300)  # <--- počet sekund uplynulých od začátku UNIX epochy (January 1, 1970)
+
+nan_dt = pd.Timestamp(np.nan)  # Nan hodnota ma svoj specialny objekt NaT (vložím ho pomocí np.nan)
+
+s_timestamps = pd.date_range("2020-01-09", freq="D", periods=3, tz="Europe/Bratislava")
+	# vytvoří PandasSeries s názvem "s_timestamps"; do závorky napíšu počáteční datum; freq=délka periody(D=dny); periods=počet opakování; tz=časová zóna
+	# výsledek je ['2020-01-09 00:00:00+01:00', '2020-01-10 00:00:00+01:00', '2020-01-11 00:00:00+01:00']
+	# vytvořené hodnoty mohu umístit do tabulky df se sloupcem times pomocí: df = pd.DataFrame(sample_timestamps, columns=["times"])
+df=pd.Series(s_timestamps)  # vytvoří PandasSeries "df" z hodnot uložených v "s_timestamps"
+df.dt.year  # vypíše rok z hodnot uložených v "df"
+df.dt.dayofweek  # vypíše pořadí dne v týdnu z hodnot uložených v "df"
+df.dt.day_name()  # vypíše název dne z hodnot uložených v "df"
+
+df=pd.Series(s_timestamps).to_frame()  # vytvoří DataFrame "df" z hodnot uložených v "s_timestamps"
+
+
+df = pd.read_csv("dataset/timestamps_dataset.csv", parse_dates=["timestamp"])
+	# načte csv soubor a data ve sloupci "timestamp" uloží ve formátu datetime64[ns], aby se s nimi mohlo dále pracovat jako s časem
+
+2) ROZDÍLY MEZI DATUMY (ČASY) - DELTY
+
+x = pd.Timestamp(year=2020, month=6, day=9, hour=8, minute=30, second=20, microsecond=79, nanosecond=99)
+y = pd.Timestamp(year=2020, month=6, day=9, hour=8, minute=30, second=20, microsecond=79, nanosecond=89)
+result = x-y  # uloží do proměnné rozdíl datumů datumy x a y
+
+# Konštruktor v pandase 
+td1 = pd.Timedelta("1 days 00:42:00.89834")  # uloží do proměnné "td1" rozdíl v čase v délce uvedené v závorce
+
+# Konstruktor v pythone 
+from datetime import timedelta
+td2 = timedelta(days=55, seconds=3621, microseconds=992006)  # uloží do proměnné "td2" rozdíl v čase v délce uvedené v závorce
+
+t = current_time - td2 
+	# uloží do t rozdíl mezi časem uloženým v current_time a deltou uloženou v td2
+
+from datetime import datetime as dt
+pd.Timestamp(dt.now()) - timedelta(days=55, seconds=3621, microseconds=992006)
+	# odečte od nynějšího času deltu (rozdíl času) uvedený v timedelta
+
+
+Ukládání dat do csv a excel souborů
+
+# Zápis do csv
+df.describe().to_csv("jirkha/zkusebni_csv.csv")
+	# uloží statistiku z DataFramu "df" do nového csv souboru s názvem "zkusebni_csv" ve složce "jirkha")
+
+# Zápis do excelu
+	# nutno mít nainstalovanou knihovnu openpyxl => v příkaz. řádku zadat příkaz "pip install openpyxl"
+df.describe().to_excel("result.xlsx", sheet_name='Results_sheet')
+	# uloží statistiku z DataFramu "df" do nového excel souboru s názvem "result" do listu s názvem "Results_sheet")
+
+# do excelu vieme zapisat aj viac harkov ale len s pouzitim objektu xslswriter
+with pd.ExcelWriter('results/results_2sheets.xlsx') as writer: 
+    df.describe().to_excel(writer, sheet_name='Numbers_sheet')
+    df.loc[:, df.dtypes == np.object].describe().to_excel(writer, sheet_name='Object_sheet')
+
+
+Google Colab
+
+# zde možno pracovat obdobně jako v jupyter notebooku, jen práce běží na vzdáleném serveru
+# možno nahrát soubory z pc nebo exportovat do csv a excelu
+# možno propojit s google docs
+
+
+
+# Toto je notebook s ukazkou vyuzitia nastroja jupytert (toto je nadpis)
+## Toto je podnadpis 
+### Nadpis 3
+#### Nadpis 4
+<font color=blue>Tento text je modry</font>
+**Tento text je tucny**<br>
+__aj tento text je tucny__
+- bulet 1
+- bulet 2
+
+fotky </br>
+<img src="assets/photo.jpeg" alt="Alt text that describes the graphic" title="Title text" />
+
+Po kliknuti na tuto bunku sa dostanete do jej zdrojoveho kopu. Pre formatovany vypis bunky stlacte __ctrl+enter__ alebo __shift+enter__
+Nizsie vidite pouzitie buniek s python kodom. Kod funguje presne ako v predchadzajucich kurzoch
+
+Ak chcete jupyter notebook vypnut prepnite sa do cmd a stlacte __ctrl+c__ ak cmd neraguje stlacte to niekolkokrat a za tym stlacte enter
+
+Toto je takzvany bullet list, alebo odrazky
+- element 1
+- element 2
+

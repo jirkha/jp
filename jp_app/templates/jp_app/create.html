@@ -1,0 +1,30 @@
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Create{% endblock %}
+
+{% block content %}
+
+<h1>Create page</h1>
+<hr>
+<h2>Create Product</h2>
+<form method="post" action="/create/">
+    {% csrf_token %}
+    {{form_p.as_p}}
+    <button type="submit", name="save">Create new</button>
+</form>
+<hr>
+<h2>Create Sale</h2>
+<form method="post" action="/create/">
+    {% csrf_token %}
+    {{form_s.as_p}}
+    <button type="submit" , name="save">Create new</button>
+</form>
+<hr>
+<h2>Create Transaction</h2>
+<form method="post" action="/create/">
+    {% csrf_token %}
+    {{form_t.as_p}}
+    <button type="submit" , name="save">Create new</button>
+</form>
+
+{% endblock %}

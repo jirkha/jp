@@ -1,0 +1,104 @@
+PRINCIP
+Dockerfile > Docker image > Docker container
+
+DOCKER IMAGES
+= plán (předpis) kontejneru - binární kód, který se následně dává na DockerHub
+z nich se vytváří Docker kontejnery
+seznam příkazů (commandů) - používat přes Git Bash / terminál VSC
+
+docker --help
+# zobrazí seznam příkazů, které je možné používat
+
+ls
+#  zobrazí soubory v aktuální složce
+
+docker image ls
+# zobrazí images (=plány) dostupné v PC
+
+docker build -t test .
+# vytvoří image s názvem "test"
+
+docker build -t custom-jupyter:1.0 .
+# vytvoří image s názvem "custom-jupyter" ve verzi 1.0
+
+docker run --name misko wordpress 
+# spustí image s názvem "wordpress" a pojmenuje ho "misko"
+# pokud se "wordpress" nenachází v pc, automaticky se stáhne a následně sám spusí
+# kontejner se ale nespustí, když se v něm nenachází žádný proces/aktivita
+
+docker run --rm --name jirkha-wordpress -p 8080:80 wordpress
+# spustí (příp. nejprve i nainstaluje) wordpress s daným jménem "jirkha-wordpress" na portu 8080:80 (číslo portu najdu v informacích k danému image)
+# protože obsahuje odkaz na port 8080, bude stále bežet a čekat na příkazy
+# --rm = po ukončení procesu se vymaže a nelze jej zpětně vyvolat a najít pomocí "docker ps --all"
+
+docker run --rm -p 8888:8888 -d custom-jupyter:1.0
+# 8888:8888 = port 8888 z kontrejneru nampuje na můj port 8888
+# custom-jupyter:1.0 = použij image "custom-jupyter" ve verzi (tagu) 1.0
+# -d = proces poběží na pozadí a nikoliv na kartě
+
+docker run --rm -p 8889:8889 jupyter1 --ip='0.0.0.0' --port=8889 --no-browser --allow-root
+# spustí image "jupyter1" a přepíše předpis v image v části CMD, tzn. nastaví port na 8889
+
+docker ps
+# zobrazí seznam běžících kontejnerů
+
+docker ps --all
+# zobrazí seznam všech dříve běžících kontejnerů (mimo ty vymazané pomocí --rm)
+
+docker stop 04fce00c
+# zastaví/vypne běžící proces kontejneru s CONTAINER ID "04fce00c"
+
+docker image rm xyz abc
+# vymaže images "xyz" a "abc"
+
+docker rm ubuntu_test
+# vymaže kontejner "ubuntu test"
+
+
+
+DOCKERFILE
+= kód, který se následně dává na git
+zapisuje se do části ve VSC, kam se píše kód
+
+Možné zápisy:
+1) Shell form
+	požívá se přímý zápis bez závorek
+	příkaz se spustí přes proces shell a zabalí se do určité formy
+	
+2) Exec form
+	používají se hranaté závorky []
+	docker přímo spustí příkaz (nepoužíví se zabalení do shellu)
+
+
+FROM ubuntu:latest
+RUN echo "Hello World" > /tmp/hello.txt
+CMD ["/bin/bash", "-c", "tail -f /tmp/hello.txt"]
+
+FROM ubuntu:18.04  # 18.04 je verze image ubuntu
+RUN apt-get update && apt-get install -y \ 
+    python3 \
+    python3-pip  
+RUN pip3 install jupyterlab
+EXPOSE 8888  # slouží pro informaci, na jakém portu proces poběží
+CMD ["jupyter", "lab", "--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]
+
+FROM ubuntu:18.04
+RUN apt-get update && apt-get install -y \ 
+    python3 \
+    python3-pip  
+RUN pip3 install jupyterlab
+EXPOSE 8888
+ENTRYPOINT [ "jupyter", "lab" ]  # to, co je zde, se musí vždy vykonat, spustí se vždy na začátku (má přednost před CMD)
+CMD ["--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]  # doplňuje ENTRYPOINT, je možno přepsat commandem
+
+FROM ubuntu:18.04
+RUN apt-get update && apt-get install -y \ 
+    python3 \
+    python3-pip  
+WORKDIR /app  # vytvoří složku app a do ní pak bude ukládat pracovní soubory
+COPY requirements.txt requirements.txt  # zkopíruje soubor "requirements.txt" do image
+# ADD requirements.txt requirements.txt  # alternativa ke COPY, která má více funkcí (rozbalí zip, kopíruje soubor z URL apod.) 
+RUN pip3 install -r requirements.txt  # spustí apk uložené v souboru "requirements.txt" a bude používat jeho obsah (spustí programy v něm uložené, např. pandas)
+EXPOSE 8888
+ENTRYPOINT [ "jupyter", "lab" ]
+CMD ["--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]

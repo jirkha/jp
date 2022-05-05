@@ -1,0 +1,39 @@
+DJANGO PROJECT
+
+django-admin startproject jp_candles
+python manage.py startapp jp_candles_apx 
+
+cd ~/naucse-python/misohu/django-tutorial-main/drf/
+source .venv/drf/Scripts/activate
+cd ~/naucse-python/misohu/django-tutorial-main/drf/jp_candles/jp_candles
+
+git checkout jp2
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py shell
+
+from jp_candles_app.models import Product
+product = Product(name="Velká potisk Vltava", type="Svíčka", production_costs=105, selling_price=499)
+product.save()
+Product.objects.all()
+
+Postman:
+POST reques
+{
+    "name": "Standard Divoká višeň",
+    "type": "Svíčka",
+    "production_costs": 95,
+    "selling_price": 449
+}
+
+Models.py:
+
+class Product(models.Model):
+    name = models.CharField(max_length=256)
+    type = models.CharField(max_length=128)
+    production_costs = models.IntegerField()
+    selling_price = models.IntegerField()
+
+def _str__(self):
+        return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}, VÝROBNÍ NÁKLADY: {self.production_costs}, PRODEJNÍ CENA: {self.selling_price}"
