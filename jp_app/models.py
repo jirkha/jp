@@ -43,3 +43,6 @@ class Transaction(models.Model):  # transakce
     quantity_of_product = models.IntegerField()  # množství prodaného produktu
     # automaticky doplní čas přidání transakce
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.created}"

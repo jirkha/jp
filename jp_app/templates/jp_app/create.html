@@ -2,29 +2,47 @@
 
 {% block title %}Create{% endblock %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <h1>Create page</h1>
 <hr>
 <h2>Create Product</h2>
-<form method="post" action="/create/">
+<form method="post" action="/create/" class="form-group">
     {% csrf_token %}
-    {{form_p.as_p}}
-    <button type="submit", name="save">Create new</button>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            {{form_p|crispy}}
+            <button type="submit" , name="save_p" , value="p", class="btn btn-primary">Create new</button>
+        </div>
+        
+    </div>
 </form>
+
 <hr>
 <h2>Create Sale</h2>
-<form method="post" action="/create/">
+<form method="post" action="/create/" class="form-group">
     {% csrf_token %}
-    {{form_s.as_p}}
-    <button type="submit" , name="save">Create new</button>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            {{form_s|crispy}}
+            <button type="submit" , name="save_s" , value="s" , class="btn btn-primary">Create new</button>
+        </div>
+
+    </div>
 </form>
+
 <hr>
 <h2>Create Transaction</h2>
-<form method="post" action="/create/">
+<form method="post" action="/create/" class="form-group">
     {% csrf_token %}
-    {{form_t.as_p}}
-    <button type="submit" , name="save">Create new</button>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            {{form_t|crispy}}
+            <button type="submit" , name="save_t" , value="t", class="btn btn-primary">Create new</button>
+        </div>
+    </div>
 </form>
 
 {% endblock %}

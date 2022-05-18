@@ -1,20 +1,67 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>
+
+<body>
+
 {% extends 'jp_app/base.html' %}
 
-{% block title %}List{% endblock %}
+{% block title %}Přehled{% endblock %}
 
 {% block content %}
-<h1>Lists</h1>
+<h1>Přehledy</h1>
 
-<h2>List of Products</h2>
-<ul>
+<h2>Přehled produktů</h2>
+<table style="width:100%">
+    <tr>
+        <th>Název produktu</th>
+        <th>Typ</th>
+        <th>Výrobní náklady</th>
+        <th>Prodejní cena</th>
+        <th>Vytvořeno</th>
+    </tr>
     {% for product in p %}
-        <li>{{ product.name }} ({{ product.type }})</li>
+        <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.type }}</td>
+        <td>{{ product.production_costs }}</td>
+        <td>{{ product.selling_price }}</td>
+        <td>{{ product.created }}</td>
+        </tr>
     {% endfor %}
-</ul>
-<h2>List of Sales</h2>
+</table>
+
+<h2>Přehled prodejních kanálů</h2>
 <ul>
     {% for sale in s %}
     <li>{{ sale.name }}</li>
     {% endfor %}
 </ul>
+
+<h2>Přehled transakcí</h2>
+<table style="width:100%">
+    <tr>
+        <th>Den prodeje</th>
+        <th>Prodejní kanál</th>
+        <th>Produkt</th>
+        <th>Množství produktu</th>
+        <th>Transakce vytvořena</th>
+    </tr>
+    {% for transaction in t %}
+        <tr>
+            <td>{{ transaction.day_of_sale }}</td>
+            <td>{{ transaction.sales_channel }}</td>
+            <td>{{ transaction.product }}</td>
+            <td>{{ transaction.quantity_of_product }}</td>
+            <td>{{ transaction.created }}</td>        
+        </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}
