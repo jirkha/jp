@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'jp_app.apps.JpAppConfig',
     'register.apps.RegisterConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'jp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,6 +122,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 STATIC_URL = 'static/'
 

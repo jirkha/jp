@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>
+
+<body>
+
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Sklad{% endblock %}
+
+{% block content %}
+<div class="p-3 mb-2 bg-info text-white">SKLAD</div>
+
+<HR>
+<h2>Aktuální stav skladu</h2>
+<p>Celkový počet položek: {{ m_count }}</p>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Zboží</th>
+            <th scope="col">Typ zboží</th>
+            <th scope="col">Množství</th>
+            <th scope="col">Celková cena</th>            
+        </tr>
+    </thead>
+    <tbody>
+        {% for material in m %}
+            <tr>
+                <th scope="row">{{ material.name }}</th>
+                <td>{{ material.type }}</td>
+                <td>{{ material.quantity_of_material }}</td>
+                <td>({{ material.price }})</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<HR>
+<h2>Naskladnění</h2>
+<form method="post" action="#">
+    {% csrf_token %}
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Den naskladnění</th>
+                <th scope="col">Typ</th>
+                <th scope="col">Zboží</th>
+                <th scope="col">Množství</th>
+                <th scope="col">Cena</th>
+                <th scope="col">Obchod</th>
+                <th scope="col">Odkaz</th>
+                <th scope="col">Poznámka</th>
+                <th scope="col">Vytvořeno</th>
+                <th scope="col">Vymazání</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in st %}
+                <tr>
+                    <td>{{ material.day_of_storage }}</td>
+                    <td>{{ material.material_type }}</td>
+                    <th scope="row">{{ material.material }}</th>
+                    <td>{{ material.quantity_of_material }}</td>
+                    <td>{{ material.price }}</td>
+                    <td>{{ material.shop }}</td>
+                    <td>{{ material.url }}</td>
+                    <td>{{ material.note }}</td>
+                    <td>{{ material.created }}</td>
+                    <td><button type="submit" , name="delete_st" , value="{{material.id}}" , class="btn btn-danger">Delete</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<HR>
+<h2>Vyskladnění</h2>
+<form method="post" action="#">
+    {% csrf_token %}
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Den vyskladnění</th>
+                <th scope="col">Typ</th>
+                <th scope="col">Zboží</th>
+                <th scope="col">Množství</th>
+                <th scope="col">Poznámka</th>
+                <th scope="col">Vytvořeno</th>
+                <th scope="col">Vymazání</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in r %}
+                <tr>
+                    <td>{{ material.day_of_removal }}</td>
+                    <td>{{ material.material_type }}</td>
+                    <th scope="row">{{ material.material }}</th>
+                    <td>{{ material.quantity_of_material }}</td>
+                    <td>{{ material.note }}</td>        
+                    <td>{{ material.created }}</td>
+                    <td><button type="submit" , name="delete_r" , value="{{material.id}}" , class="btn btn-danger">Delete</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<HR>
+<h2>Přehled typu surovin</h2>
+<p>Počet položek: {{ mt_count }}</p>
+<ul>
+    {% for material_type in mt %}
+    <li>{{ material_type.name }}</li>
+    {% endfor %}
+</ul>
+
+
+{% endblock %}

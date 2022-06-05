@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>
+
+<body>
+
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Idea{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="p-3 mb-2 bg-info text-white">NÁPADY</div>
+
+<h2>Seznam nápadů</h2>
+<p>Celkový počet položek: {{ object_list.count }}</p>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Název produktu</th>
+            <th scope="col">Typ produktu</th>
+            <th scope="col">Výrobní náklady</th>
+            <th scope="col">Prodejní cena</th>
+            <th scope="col">Předpoklad uvedení na trh</th>
+            <th scope="col">Stav</th>
+            <th scope="col">Editace</th>
+            <th scope="col">Smazání</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in object_list %}
+            <tr>
+                <th scope="row"><a href="{% url 'jp_app:idea-detail' post.pk %}">{{ post.name }}</a></th>
+                <td>{{ post.product_type }}</td>
+                <td>{{ post.production_costs }}</td>
+                <td>{{ post.selling_price }}</td>
+                <td>{{ post.introduction_day }}</td>
+                <td>{{ post.status }}</td>
+                <td><a href="{% url 'jp_app:idea_update' post.pk %}" class="btn btn-info">Editovat</a></td>
+                <td><a href="{% url 'jp_app:idea_delete' post.pk %}" class="btn btn-danger">Smazat</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Idea List{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="p-3 mb-2 bg-info text-white">PODROBNOSTI NÁPADU</div>
+
+<div class="jumbotron">
+    <h1 class="display-4">{{ idea.name }}</h1>
+    <p class="lead">Typ pruduktu: <b>{{ idea.product_type }}</b></p>
+    <p class="lead">Výrobní náklady: <b>{{ idea.production_costs }}</b></p>
+    <p class="lead">Prodejní cena: <b>{{ idea.selling_price }}</b></p>
+    <p class="lead">Předpoklad uvedení na trh: <b>{{ idea.introduction_day }}</b></p>
+    <p class="lead">Status: <b>{{ idea.status }}</b></p>
+    {% load static %}
+    <img class="card-img-right" src="{% static 'jp_app/DSC00293_2.jpg' %}" alt="Card image cap">
+    <hr class="my-4">
+    <p><b>Poznámky:</b><br>{{ idea.note }}</p>
+    <p class="lead">
+        <a class="btn btn-info btn-lg" href="{% url 'jp_app:idea_update' idea.pk %}" role="button">Editovat</a>
+        <a class="btn btn-danger btn-lg" href="{% url 'jp_app:idea_delete' idea.pk %}" role="button">Smazat</a>
+    </p>
+</div>
+{% endblock %}

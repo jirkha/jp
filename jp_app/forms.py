@@ -1,6 +1,12 @@
 from django import forms
 from django.forms import ModelForm
-from jp_app.models import Product, Sale, Transaction
+from jp_app.models import ProductType, Product, Sale, Transaction
+from jp_app.models import MaterialType, Material, Storage, Removal
+from jp_app.models import Idea
+
+
+###   PRODEJ   ###
+
 
 # class CreateProduct(forms.Form):
 #     name = forms.CharField(label="Jméno", max_length=256)  # název produktu
@@ -9,10 +15,15 @@ from jp_app.models import Product, Sale, Transaction
 #     production_costs = forms.IntegerField(label="Výrobní náklady")  # výrobní náklady
 #     selling_price = forms.IntegerField(label="Prodejní cena")  # prodejní cena
 
+class ProductTypeForm(ModelForm):
+    class Meta:
+        model = ProductType
+        fields = ["name"]
+
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ["name", "type", "production_costs", "selling_price"]
+        fields = ["name", "product_type", "production_costs", "selling_price"]
 
 
 class SaleForm(ModelForm):
@@ -35,3 +46,50 @@ class TransactionForm(ModelForm):
         widgets = {'day_of_sale': DateInput()}
         #fields = '__all__'
 
+
+###   SKLAD   ###
+
+
+class MaterialTypeForm(ModelForm):
+    class Meta:
+        model = MaterialType
+        fields = ["name"]
+
+
+class MaterialForm(ModelForm):
+    class Meta:
+        model = Material
+        fields = ["name", "type"]
+
+
+class StorageForm(ModelForm):
+    class Meta:
+        model = Storage
+        fields = '__all__'
+        widgets = {'day_of_storage': DateInput()}
+
+
+class RemovalForm(ModelForm):
+    class Meta:
+        model = Removal
+        fields = '__all__'
+        widgets = {'day_of_removal': DateInput()}
+
+
+
+###   NÁPADY   ###
+
+
+class IdeaForm(ModelForm):
+    class Meta:
+        model = Idea
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Jméno'}),
+            'product_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'production_costs': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Výrobní náklady'}),
+            'selling_price': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Prodejní cena'}),
+            'introduction_day': forms.DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'rrrr-mm-dd'}),
+            'status': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'note': forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
+        }

@@ -12,56 +12,106 @@
 
 {% extends 'jp_app/base.html' %}
 
-{% block title %}Přehled{% endblock %}
+{% block title %}Přehled produktů{% endblock %}
 
+{% load crispy_forms_tags %}
+<HR>
 {% block content %}
-<h1>Přehledy</h1>
+<div class="p-3 mb-2 bg-info text-white">PRODUKTY</div>
 
+<HR>
+
+<!-- <h2>Přehled transakcí</h2>
+<form class="form-group" method="get">
+
+            
+    <div class="card card-body">
+        <h5>Filtr zobrazovaných transakcí</h5>
+        <div class="input-group mb-3">
+            
+                <div class="input-group-prepend">
+                    {% csrf_token %}
+                    {{myFilter.form|crispy}}
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit">Search</button>
+            
+                </div>
+       
+        </div>
+    
+    </div>
+    
+</form> -->
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <form class="form-group" method="get">
+                    <th scope="col">Den prodeje {{ myFilter.form.day_of_sale }}</th>
+                    <th scope="col">Prodejní kanál {{ myFilter.form.sales_channel }}</th>
+                    <th scope="col">Produkt {{ myFilter.form.product }}</th>
+                    <th scope="col">Množství produktu {{ myFilter.form.quantity_of_product }}</th>
+                    <th scope="col">Transakce vytvořena {{ myFilter.form.created }}</th>
+                    <th scope="col"><button class="btn btn-primary" type="submit">Filtrovat</button></th>
+                </form>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in t %}
+                <tr>
+                    <td>{{ transaction.day_of_sale }}</td>
+                    <td>{{ transaction.sales_channel }}</td>
+                    <th scope="row">{{ transaction.product }}</th>
+                    <td>{{ transaction.quantity_of_product }}</td>
+                    <td>{{ transaction.created }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<HR>
 <h2>Přehled produktů</h2>
-<table style="width:100%">
-    <tr>
-        <th>Název produktu</th>
-        <th>Typ</th>
-        <th>Výrobní náklady</th>
-        <th>Prodejní cena</th>
-        <th>Vytvořeno</th>
-    </tr>
-    {% for product in p %}
+<table class="table">
+    <thead class="thead-dark">
         <tr>
-        <td>{{ product.name }}</td>
-        <td>{{ product.type }}</td>
-        <td>{{ product.production_costs }}</td>
-        <td>{{ product.selling_price }}</td>
-        <td>{{ product.created }}</td>
+            <th scope="col">Název produktu</th>
+            <th scope="col">Typ</th>
+            <th scope="col">Výrobní náklady</th>
+            <th scope="col">Prodejní cena</th>
+            <th scope="col">Vytvořeno</th>
         </tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+        {% for product in p %}
+            <tr>
+                <th scope="row">{{ product.name }}</th>
+                <td>{{ product.product_type }}</td>
+                <td>{{ product.production_costs }}</td>
+                <td>{{ product.selling_price }}</td>
+                <td>{{ product.created }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
+<HR>
+<h2>Přehled typů produktů</h2>
+<p>Počet položek: {{ pt_count }}</p>
+<ul>
+    {% for product_type in pt %}
+    <li>{{ product_type.name }}</li>
+    {% endfor %}
+</ul>
+
+<HR>
 <h2>Přehled prodejních kanálů</h2>
 <ul>
     {% for sale in s %}
     <li>{{ sale.name }}</li>
     {% endfor %}
 </ul>
-
-<h2>Přehled transakcí</h2>
-<table style="width:100%">
-    <tr>
-        <th>Den prodeje</th>
-        <th>Prodejní kanál</th>
-        <th>Produkt</th>
-        <th>Množství produktu</th>
-        <th>Transakce vytvořena</th>
-    </tr>
-    {% for transaction in t %}
-        <tr>
-            <td>{{ transaction.day_of_sale }}</td>
-            <td>{{ transaction.sales_channel }}</td>
-            <td>{{ transaction.product }}</td>
-            <td>{{ transaction.quantity_of_product }}</td>
-            <td>{{ transaction.created }}</td>        
-        </tr>
-    {% endfor %}
-</table>
 
 {% endblock %}
