@@ -7,4 +7,4 @@ class TransactionFilter(django_filters.FilterSet):
         model = Transaction
         # fields = '__all__'
         fields = ["day_of_sale", "sales_channel",
-                  "product", "quantity_of_product", "created"]
+                  "product", "selling_price", "quantity_of_product", "created"]

@@ -55,7 +55,19 @@
                 </p>
             </div>
         </div>
-        
+        <br>
+        <div class="card bg-secondary text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Tvorba typu prodejního kanálu</h5>
+                <p class="card-text">
+                <form method="post" action="/create/" class="form-group">
+                    {% csrf_token %}
+                    {{form_st|crispy}}
+                    <button type="submit" , name="save_st" , value="st" , class="btn btn-dark">Vytvořit</button>
+                </form>
+                </p>
+            </div>
+        </div>
     </div>
 
 </div>

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from jp_app.models import ProductType, Product, Sale, Transaction
+from jp_app.models import ProductType, Product, SaleType, Sale, Transaction
 from jp_app.models import MaterialType, Material, Storage, Removal
 from jp_app.models import Idea
 
@@ -23,8 +23,12 @@ class ProductTypeForm(ModelForm):
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ["name", "product_type", "production_costs", "selling_price"]
+        fields = ["name", "product_type", "production_costs", "jp_candles"]
 
+class SaleTypeForm(ModelForm):
+    class Meta:
+        model = SaleType
+        fields = ["name"]
 
 class SaleForm(ModelForm):
     class Meta:
@@ -42,7 +46,8 @@ class TransactionForm(ModelForm):
     #product = forms.ModelChoiceField(queryset=Product.objects.filter(id=1))
     class Meta:
         model = Transaction
-        fields = ["day_of_sale","sales_channel","product","quantity_of_product"]
+        fields = ["day_of_sale", "sales_channel",
+                  "product", "selling_price", "quantity_of_product"]
         widgets = {'day_of_sale': DateInput()}
         #fields = '__all__'
 

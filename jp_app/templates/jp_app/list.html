@@ -21,6 +21,78 @@
 
 <HR>
 
+<h2>Test</h2>
+<ul>
+    {% for sale in q %}
+    <li>{{ sale.day_of_sale|date:"SHORT_DATE_FORMAT" }}</li>
+    {% endfor %}
+</ul>
+<ul>
+    {% for sale in q %}
+    <li>{{ sale.sum }}</li>
+    {% endfor %}
+</ul>
+<ul>
+    {% for x, y in tt %}
+    <li>{{ x }} {{ y }}</li>
+    {% endfor %}
+</ul>
+
+<HR>
+<h2>Přehled produktů</h2>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="row">Datum</th>
+            <th scope="row">Utrženo</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        {% for x, y in tt %}
+        <tr>
+        
+            <th >{{ x|date:"SHORT_DATE_FORMAT" }}</th>
+            <th >{{ y }}</th>
+        
+        </tr>
+        {% endfor %}
+<!--         
+        <tr>
+        {% for sum in temp_dict %}
+            <th scope="row">{{ sum }}</th>
+        {% endfor %}
+        </tr>
+       -->
+    </tbody>
+</table>
+
+
+<!-- <h2>Prodané položky</h2>
+<p>Celkový počet položek: {{ m_count }}</p>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Zboží</th>
+            <th scope="col">Typ zboží</th>
+            <th scope="col">Množství</th>
+            <th scope="col">Celková cena</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for material in m %}
+        <tr>
+            <th scope="row">{{ material.name }}</th>
+            <td>{{ material.type }}</td>
+            <td>{{ material.quantity_of_material }}</td>
+            <td>({{ material.price }})</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table> -->
+
+<HR>
+
 <!-- <h2>Přehled transakcí</h2>
 <form class="form-group" method="get">
 
@@ -44,6 +116,7 @@
     
 </form> -->
 
+<h2>Přehled transakcí</h2>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead class="thead-dark">
@@ -52,7 +125,9 @@
                     <th scope="col">Den prodeje {{ myFilter.form.day_of_sale }}</th>
                     <th scope="col">Prodejní kanál {{ myFilter.form.sales_channel }}</th>
                     <th scope="col">Produkt {{ myFilter.form.product }}</th>
-                    <th scope="col">Množství produktu {{ myFilter.form.quantity_of_product }}</th>
+                    <th scope="col">Prodejní cena {{ myFilter.form.selling_price }}</th>
+                    <th scope="col">Množství produktu</th>
+                    <th scope="col">Celkem utrženo</th>
                     <th scope="col">Transakce vytvořena {{ myFilter.form.created }}</th>
                     <th scope="col"><button class="btn btn-primary" type="submit">Filtrovat</button></th>
                 </form>
@@ -64,7 +139,9 @@
                     <td>{{ transaction.day_of_sale }}</td>
                     <td>{{ transaction.sales_channel }}</td>
                     <th scope="row">{{ transaction.product }}</th>
+                    <td>{{ transaction.selling_price }}</td>
                     <td>{{ transaction.quantity_of_product }}</td>
+                    <td>{{ transaction.sum }}</td>
                     <td>{{ transaction.created }}</td>
                 </tr>
             {% endfor %}
@@ -81,6 +158,8 @@
             <th scope="col">Typ</th>
             <th scope="col">Výrobní náklady</th>
             <th scope="col">Prodejní cena</th>
+            <th scope="col">J&P CANDLES</th>
+            <th scope="col">Prodáno ks (množství)</th>
             <th scope="col">Vytvořeno</th>
         </tr>
     </thead>
@@ -91,6 +170,8 @@
                 <td>{{ product.product_type }}</td>
                 <td>{{ product.production_costs }}</td>
                 <td>{{ product.selling_price }}</td>
+                <td>{{ product.jp_candles }}</td>
+                <td>{{ product.sold }}</td>
                 <td>{{ product.created }}</td>
             </tr>
         {% endfor %}
@@ -111,6 +192,14 @@
 <ul>
     {% for sale in s %}
     <li>{{ sale.name }}</li>
+    {% endfor %}
+</ul>
+
+<HR>
+<h2>Přehled typů prodejních kanálů</h2>
+<ul>
+    {% for sale_type in st %}
+    <li>{{ sale_type.name }}</li>
     {% endfor %}
 </ul>
 

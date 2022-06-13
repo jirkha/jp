@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+import datetime
 
 # Create your models here.
 
@@ -23,7 +24,10 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
     product_type = models.ForeignKey(
         ProductType, related_name="product_types", on_delete=models.RESTRICT) # volba tyupu produktu
     production_costs = models.IntegerField()  # výrobní náklady
-    selling_price = models.IntegerField()  # prodejní cena
+    # prodaných ks / prodané množství (nezadává se při tvorbě produktu, ale automaticky při transakci)
+    sold = models.IntegerField(default=0)
+    # uvádí (a/n), zda se jedná o výrobek pod značkou J&P CANDLES nebo pod jinou značkou (externí spolupráce)
+    jp_candles = models.BooleanField(default=True)
     # automaticky doplní čas přidání produktu
     created = models.DateTimeField(auto_now_add=True)
 
@@ -35,11 +39,22 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
         return f"{self.name})"
 
 
-class Sale(models.Model):  # typ prodejního kanálu
-    # např. názen trhu, název obchodu kde byla svíčka prodána, eshop atd.
+class SaleType(models.Model):  # typ prodejního kanálu
+    # název typu prodejního kanálu (# trh / eshop / komisní prodej / kamenný obchod / externí spolupráce apod.)
     name = models.CharField(max_length=256)
-    # trh / eshop / komisní prodej / externí spolupráce
-    type = models.CharField(max_length=128)
+    # automaticky doplní čas přidání typu kanálu
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Sale(models.Model):  # typ prodejního kanálu
+    # např. název konkrétního trhu, název obchodu kde byla svíčka prodána, eshop atd.
+    name = models.CharField(max_length=256)
+    type = models.ForeignKey(
+        SaleType, related_name="sale_types", on_delete=models.RESTRICT)  # volba typu prodejního kanálu
+    sold = models.TextField(default="")
     # uvádí (a/n), zda se jedná o prodejní kanál pod značkou JPcandles nebo pro výrobu pod jinou značkou (externí spolupráce)
     jp_candles = models.BooleanField()
 
@@ -55,14 +70,26 @@ class Transaction(models.Model):  # transakce
         Sale, related_name="sales", on_delete=models.RESTRICT)
     product = models.ForeignKey(
         Product, related_name="products", on_delete=models.RESTRICT)  # prodaný produkt
+    selling_price = models.IntegerField(default=0)  # prodejní cena za 1 ks / produkt
     quantity_of_product = models.IntegerField()  # množství prodaného produktu
     # automaticky doplní čas přidání transakce
+    # sum = value(selling_price) * quantity_of_product
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.product}"
-
-
+    
+    def sum(self):
+        x = self.selling_price * self.quantity_of_product
+        return x
+    
+    def total(self):
+        total = [[(datetime.date(2022, 6, 10)), 100], [
+            (datetime.date(2022, 6, 11)), 150]]
+        # pokračovat v psaní funkce, 
+        # která bude postupně ukládat všechna data, kdy byla zadána transakce 
+        # do listu spolu s se součtem funkce sum, tzn. bude to více listů v jednom velkém listu
+        # (každýá dílčí list bude jedno datum)
 
 
 ###   SKLAD   ###

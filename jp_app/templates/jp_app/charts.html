@@ -1,0 +1,294 @@
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Charts{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="p-3 mb-2 bg-info text-white">GRAFY</div>
+
+<hr>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = [{% for item in m %} '{{ item.name }}', {% endfor %}];
+
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Množství suroviny',
+            backgroundColor: 'rgb(255, 199, 132)',
+            borderColor: 'rgb(255, 99, 232)',
+            data: [{% for item in m %} '{{ item.quantity_of_material }}', {% endfor %}],
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {}
+    };
+</script>
+
+
+<div class="row">
+    <div class="col-md-6 col-12">
+        <div class="card" style="margin-top:30px;">
+            <div class="card-body">
+                <h5 class="card-title">Skladové zásoby</h5>
+                <canvas id="myChart" width="300" height="300">
+
+                    <script>
+                        const myChart = new Chart(
+                            document.getElementById('myChart'),
+                            config
+                        );
+                    </script>
+                </canvas>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-12">
+        <div class="card" style="margin-top:30px;">
+            <div class="card-body">
+                <h5 class="card-title">Graf 1</h5>
+                <canvas id="myChartTwo" width="400" height="400"></canvas>
+                <script>
+                    var labels = [{% for item in q %} '{{ item.day_of_sale }}', {% endfor %}];
+                    var ctx = document.getElementById('myChart1').getContext('2d');
+                    var myChartTwo = new Chart(ctx, {
+                        type: 'line',
+                        dataTwo: {
+                            labels: labels,
+                            datasets: [{
+                                label: '{{ item.day_of_sale }}',
+                                data: '{{ item.sum }}',
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+                </canvas>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<<!doctype html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Getting Started with Chart JS with www.chartjs3.com</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+            }
+
+            .chartMenu {
+                width: 100vw;
+                height: 40px;
+                background: #1A1A1A;
+                color: rgba(255, 26, 104, 1);
+            }
+
+            .chartMenu p {
+                padding: 10px;
+                font-size: 20px;
+            }
+
+            .chartCard {
+                width: 100vw;
+                height: calc(100vh - 40px);
+                background: rgba(255, 26, 104, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .chartBox {
+                width: 700px;
+                padding: 20px;
+                border-radius: 20px;
+                border: solid 3px rgba(255, 26, 104, 1);
+                background: white;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="chartMenu">
+            <p>WWW.CHARTJS3.COM (Chart JS 3.8.0)</p>
+        </div>
+        <div class="chartCard">
+            <div class="chartBox">
+                <canvas id="myChartTree"></canvas>
+            </div>
+        </div>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // setup 
+            const dataTree = {
+                labels: [{% for item in q %} '{{ item.day_of_sale }}', {% endfor %}],
+            datasets: [{
+                label: 'Graf',//[{% for item in t %} '{{ item.product }}', {% endfor %}],
+                data: [{% for item in t %} '{{ item.sum }}', {% endfor %}],
+                backgroundColor: [
+                    'rgba(255, 26, 104, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(0, 0, 0, 0.2)'
+                ],
+                    borderColor: [
+                        'rgba(255, 26, 104, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(0, 0, 0, 1)'
+                    ],
+                        borderWidth: 1,
+                //             parsing: {
+                // xAxisKey: '{{ item.product }}',
+                //     yxisKey: '{{ item.quantity_of_product }}',
+                // }
+            }]
+        };
+
+            // config 
+            const configTree = {
+                type: 'line',
+                data: dataTree,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+
+            // render init block
+            const myChartTree = new Chart(
+                document.getElementById('myChartTree'),
+                configTree
+            );
+        </script>
+
+    </body>
+
+    </html>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <canvas id="chart" height="90"></canvas>
+
+    <script>
+        const label = [{% for item in t %} '{{ item.day_of_sale }}', {% endfor %}], //
+        const coworker = [{% for item in t %} '{{ item.product }}', {% endfor %}],//
+        const data = [{% for item in t %} '{{ item.quantity_of_product }}', {% endfor %}], //
+
+        var myChart = new Chart('chart', {
+            type: 'line',
+            data: {
+                labels: label,
+                datasets: [{
+                    label: coworker[0],
+                    data: data[0],
+                    backgroundColor: 'red'
+                },
+                {
+                    label: coworker[1],
+                    data: data[1],
+                    backgroundColor: 'blue'
+                },
+                {
+                    label: coworker[2],
+                    data: data[2],
+                    backgroundColor: 'green'
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }],
+                }
+            }
+        });
+    </script>
+<!-- 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<canvas id="chart" height="90"></canvas>
+<script>
+    const label = {{ t | safe }}; //
+    const coworker = {{ t | safe }};//
+    const data = {{ t | safe }}; //
+
+    var myChart = new Chart('chart', {
+        type: 'line',
+        data: {
+            labels: label,
+            datasets: [{
+                label: coworker,
+                data: data,
+                backgroundColor: 'red'
+          
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                    }
+                }],
+            }
+        }
+    });
+</script>
+ -->
+
+
+{% endblock %}

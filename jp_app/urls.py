@@ -17,5 +17,6 @@ urlpatterns = [
     path("idea_update/<int:pk>", UpdateIdea.as_view(), name="idea_update"),
     path("idea_delete/<int:pk>", DeleteIdea.as_view(), name="idea_delete"),
     path("idea_add/", CreateIdea.as_view(), name="idea_add"),
+    path("transaction_chart/", views.transaction_chart, name="transaction_chart"),
     # path('jp_candles/', include("jp_candles_app.urls"))
 ]
