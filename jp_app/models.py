@@ -22,7 +22,7 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
     name = models.CharField(max_length=256)  # název produktu
     # typ produktu (svíčka / vonný vosk / difuzér atd.)
     product_type = models.ForeignKey(
-        ProductType, related_name="product_types", on_delete=models.RESTRICT) # volba tyupu produktu
+        ProductType, related_name="product_types", on_delete=models.CASCADE) # volba tyupu produktu
     production_costs = models.IntegerField()  # výrobní náklady
     # prodaných ks / prodané množství (nezadává se při tvorbě produktu, ale automaticky při transakci)
     sold = models.IntegerField(default=0)
@@ -36,7 +36,7 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
 
     def __str__(self):
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"
-        return f"{self.name})"
+        return f"{self.name}"
 
 
 class SaleType(models.Model):  # typ prodejního kanálu
@@ -53,7 +53,7 @@ class Sale(models.Model):  # typ prodejního kanálu
     # např. název konkrétního trhu, název obchodu kde byla svíčka prodána, eshop atd.
     name = models.CharField(max_length=256)
     type = models.ForeignKey(
-        SaleType, related_name="sale_types", on_delete=models.RESTRICT)  # volba typu prodejního kanálu
+        SaleType, related_name="sale_types", on_delete=models.CASCADE)  # volba typu prodejního kanálu
     sold = models.TextField(default="")
     # uvádí (a/n), zda se jedná o prodejní kanál pod značkou JPcandles nebo pro výrobu pod jinou značkou (externí spolupráce)
     jp_candles = models.BooleanField()
@@ -67,29 +67,27 @@ class Transaction(models.Model):  # transakce
     day_of_sale = models.DateField()  # datum transakce
     # prodejní kanál
     sales_channel = models.ForeignKey(
-        Sale, related_name="sales", on_delete=models.RESTRICT)
+        Sale, related_name="sales", on_delete=models.CASCADE)
     product = models.ForeignKey(
-        Product, related_name="products", on_delete=models.RESTRICT)  # prodaný produkt
-    selling_price = models.IntegerField(default=0)  # prodejní cena za 1 ks / produkt
+        Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
+    product_price = models.FloatField(default=0)  # prodejní cena za 1 ks / produkt
     quantity_of_product = models.IntegerField()  # množství prodaného produktu
+    total_price = models.FloatField(blank=True) #, default=0)
     # automaticky doplní čas přidání transakce
-    # sum = value(selling_price) * quantity_of_product
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.product}"
     
-    def sum(self):
-        x = self.selling_price * self.quantity_of_product
-        return x
+    ### automaticky počítá celkovou utrženou částku dané transakce
+    def save(self, *args, **kwargs):
+        self.total_price = self.product_price * self.quantity_of_product
+        return super().save(*args, **kwargs)
     
-    def total(self):
-        total = [[(datetime.date(2022, 6, 10)), 100], [
-            (datetime.date(2022, 6, 11)), 150]]
-        # pokračovat v psaní funkce, 
-        # která bude postupně ukládat všechna data, kdy byla zadána transakce 
-        # do listu spolu s se součtem funkce sum, tzn. bude to více listů v jednom velkém listu
-        # (každýá dílčí list bude jedno datum)
+    # def total(self):
+    #     #total = Transaction.objects.all().sum()
+    #     return Transaction.objects.all().sum()
+
 
 
 ###   SKLAD   ###
@@ -107,7 +105,7 @@ class MaterialType(models.Model):  # typ skladového materiálu
 class Material(models.Model):  # skladový materiál
     name = models.CharField(max_length=256)  # název suroviny (vosk sójový XYZ apod.)
     type = models.ForeignKey(
-        MaterialType, related_name="types", on_delete=models.RESTRICT)
+        MaterialType, related_name="types", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     quantity_of_material = models.IntegerField(default=0, blank=True) # množství materiálu
     price = models.IntegerField(default=0, blank=True) # nákupní cena
@@ -121,9 +119,9 @@ class Storage(models.Model):  # naskladnění materiálu do skladu
     day_of_storage = models.DateField()  # datum naskladnění
     # prodejní kanál
     material_type = models.ForeignKey(
-        MaterialType, related_name="material_types", on_delete=models.RESTRICT)
+        MaterialType, related_name="material_types", on_delete=models.CASCADE)
     material = models.ForeignKey(
-        Material, related_name="materials", on_delete=models.RESTRICT)  # přidaný materiál
+        Material, related_name="materials", on_delete=models.CASCADE)  # přidaný materiál
     quantity_of_material = models.IntegerField()  # množství přidaného materiálu
     price = models.IntegerField() # celková cena (nikoliv za jednotku, ale celkem)
     shop = models.CharField(max_length=256, blank=True)
@@ -140,9 +138,9 @@ class Removal(models.Model):  # vyskladnění materiálu ze skladu
     day_of_removal = models.DateField()  # datum vyskladnění
     # prodejní kanál
     material_type = models.ForeignKey(
-        MaterialType, related_name="removal_types", on_delete=models.RESTRICT)
+        MaterialType, related_name="removal_types", on_delete=models.CASCADE)
     material = models.ForeignKey(
-        Material, related_name="removals", on_delete=models.RESTRICT)  # vyskladňovaný materiál
+        Material, related_name="removals", on_delete=models.CASCADE)  # vyskladňovaný materiál
     quantity_of_material = models.IntegerField()  # množství vyskladněného materiálu
     #price = models.IntegerField()  # celková cena (nikoliv za jednotku, ale celkem)
     #shop = models.CharField(max_length=256)
@@ -172,7 +170,8 @@ class Idea(models.Model):  # nápad na nový výrobek
     )
 
     name = models.CharField(max_length=256)  # název výrobku
-    product_type = models.ForeignKey(ProductType, related_name = "product_types_2", on_delete = models.RESTRICT)  # volba typu produktu
+    product_type = models.ForeignKey(
+        ProductType, related_name="product_types_2", on_delete=models.CASCADE)  # volba typu produktu
     production_costs = models.IntegerField()  # předpokládané výrobní náklady
     selling_price = models.IntegerField()  # předpokládaná prodejní cena
     introduction_day = models.DateField()  # datum uvedení na trh

@@ -20,101 +20,29 @@
 <div class="p-3 mb-2 bg-info text-white">PRODUKTY</div>
 
 <HR>
-
-<h2>Test</h2>
-<ul>
-    {% for sale in q %}
-    <li>{{ sale.day_of_sale|date:"SHORT_DATE_FORMAT" }}</li>
-    {% endfor %}
-</ul>
-<ul>
-    {% for sale in q %}
-    <li>{{ sale.sum }}</li>
-    {% endfor %}
-</ul>
-<ul>
-    {% for x, y in tt %}
-    <li>{{ x }} {{ y }}</li>
-    {% endfor %}
-</ul>
-
-<HR>
-<h2>Přehled produktů</h2>
+<h2>Přehled tržeb v jednotlivých dnech</h2>
 <table class="table">
     <thead class="thead-dark">
         <tr>
             <th scope="row">Datum</th>
             <th scope="row">Utrženo</th>
         </tr>
-
     </thead>
     <tbody>
         {% for x, y in tt %}
         <tr>
-        
-            <th >{{ x|date:"SHORT_DATE_FORMAT" }}</th>
-            <th >{{ y }}</th>
-        
-        </tr>
+            <td >{{ x|date:"SHORT_DATE_FORMAT" }}</td>
+            <td >{{ y }} Kč</td>
         {% endfor %}
-<!--         
+        </tr>    
         <tr>
-        {% for sum in temp_dict %}
-            <th scope="row">{{ sum }}</th>
-        {% endfor %}
+            <th scope="col">CELKEM</th>
+            <th scope="col">{{ total }} Kč</th>
         </tr>
-       -->
     </tbody>
 </table>
 
-
-<!-- <h2>Prodané položky</h2>
-<p>Celkový počet položek: {{ m_count }}</p>
-<table class="table">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Zboží</th>
-            <th scope="col">Typ zboží</th>
-            <th scope="col">Množství</th>
-            <th scope="col">Celková cena</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for material in m %}
-        <tr>
-            <th scope="row">{{ material.name }}</th>
-            <td>{{ material.type }}</td>
-            <td>{{ material.quantity_of_material }}</td>
-            <td>({{ material.price }})</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
-
 <HR>
-
-<!-- <h2>Přehled transakcí</h2>
-<form class="form-group" method="get">
-
-            
-    <div class="card card-body">
-        <h5>Filtr zobrazovaných transakcí</h5>
-        <div class="input-group mb-3">
-            
-                <div class="input-group-prepend">
-                    {% csrf_token %}
-                    {{myFilter.form|crispy}}
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-primary" type="submit">Search</button>
-            
-                </div>
-       
-        </div>
-    
-    </div>
-    
-</form> -->
 
 <h2>Přehled transakcí</h2>
 <div class="table-responsive">
@@ -139,9 +67,9 @@
                     <td>{{ transaction.day_of_sale }}</td>
                     <td>{{ transaction.sales_channel }}</td>
                     <th scope="row">{{ transaction.product }}</th>
-                    <td>{{ transaction.selling_price }}</td>
+                    <td>{{ transaction.product_price }}</td>
                     <td>{{ transaction.quantity_of_product }}</td>
-                    <td>{{ transaction.sum }}</td>
+                    <td>{{ transaction.total_price }}</td>
                     <td>{{ transaction.created }}</td>
                 </tr>
             {% endfor %}
@@ -157,9 +85,8 @@
             <th scope="col">Název produktu</th>
             <th scope="col">Typ</th>
             <th scope="col">Výrobní náklady</th>
-            <th scope="col">Prodejní cena</th>
             <th scope="col">J&P CANDLES</th>
-            <th scope="col">Prodáno ks (množství)</th>
+            <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
             <th scope="col">Vytvořeno</th>
         </tr>
     </thead>
@@ -169,7 +96,6 @@
                 <th scope="row">{{ product.name }}</th>
                 <td>{{ product.product_type }}</td>
                 <td>{{ product.production_costs }}</td>
-                <td>{{ product.selling_price }}</td>
                 <td>{{ product.jp_candles }}</td>
                 <td>{{ product.sold }}</td>
                 <td>{{ product.created }}</td>

@@ -47,9 +47,24 @@ class TransactionForm(ModelForm):
     class Meta:
         model = Transaction
         fields = ["day_of_sale", "sales_channel",
-                  "product", "selling_price", "quantity_of_product"]
+                  "product", "product_price", "quantity_of_product"]
         widgets = {'day_of_sale': DateInput()}
         #fields = '__all__'
+
+
+
+### slouží k filtrování prodaných položek dle data a následnému zobrazení v grafech
+class SearchForm(forms.Form): 
+
+    CHART_CHOICES = (
+        ('Bar chart', 'Bar chart'),
+        ('Pie chart', 'Pie chart'),
+        ('Line chart', 'Line chart')
+    )
+
+    date_from = forms.DateField(widget=DateInput)
+    date_to = forms.DateField(widget=DateInput)
+    chart_type = forms.ChoiceField(choices=CHART_CHOICES)
 
 
 ###   SKLAD   ###

@@ -9,6 +9,8 @@ urlpatterns = [
     path("<int:id>", views.index, name="index"),
     path("list", views.list, name="list"),
     path("", views.home, name="home"),
+    path("transaction_chart/", views.transaction_chart, name="transaction_chart"),
+    path("statistic/", views.statistic, name="statistic"),
     path("create/", views.create, name="create"),
     path("material/", views.material, name="material"),
     path("list_material/", views.list_material, name="list_material"),
@@ -17,6 +19,6 @@ urlpatterns = [
     path("idea_update/<int:pk>", UpdateIdea.as_view(), name="idea_update"),
     path("idea_delete/<int:pk>", DeleteIdea.as_view(), name="idea_delete"),
     path("idea_add/", CreateIdea.as_view(), name="idea_add"),
-    path("transaction_chart/", views.transaction_chart, name="transaction_chart"),
+    
     # path('jp_candles/', include("jp_candles_app.urls"))
 ]

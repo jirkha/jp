@@ -13,10 +13,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const labels = [{% for item in m %} '{{ item.name }}', {% endfor %}];
+    //const labels = [{% for item in m %} '{{ item.name }}', {% endfor %}];
 
     const data = {
-        labels: labels,
+        labels: [{% for item in m %} '{{ item.name }}', {% endfor %}],
         datasets: [{
             label: 'Množství suroviny',
             backgroundColor: 'rgb(255, 199, 132)',
@@ -26,7 +26,7 @@
     };
 
     const config = {
-        type: 'line',
+        type: 'bar',
         data: data,
         options: {}
     };
@@ -52,58 +52,43 @@
         </div>
     </div>
 
+   
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="col-md-6 col-12">
         <div class="card" style="margin-top:30px;">
             <div class="card-body">
-                <h5 class="card-title">Graf 1</h5>
-                <canvas id="myChartTwo" width="400" height="400"></canvas>
-                <script>
-                    var labels = [{% for item in q %} '{{ item.day_of_sale }}', {% endfor %}];
-                    var ctx = document.getElementById('myChart1').getContext('2d');
-                    var myChartTwo = new Chart(ctx, {
-                        type: 'line',
-                        dataTwo: {
-                            labels: labels,
+                <h5 class="card-title">Tržby</h5>
+                <canvas id="myChartSum" width="300" height="300">
+                    <script>
+                        const dataSum = {
+                                labels: [{% for x, y in tt %} '{{ x|date:"SHORT_DATE_FORMAT" }}', {% endfor %}],
                             datasets: [{
-                                label: '{{ item.day_of_sale }}',
-                                data: '{{ item.sum }}',
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.2)',
-                                    'rgba(54, 162, 235, 0.2)',
-                                    'rgba(255, 206, 86, 0.2)',
-                                    'rgba(75, 192, 192, 0.2)',
-                                    'rgba(153, 102, 255, 0.2)',
-                                    'rgba(255, 159, 64, 0.2)'
-                                ],
-                                borderColor: [
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                    'rgba(153, 102, 255, 1)',
-                                    'rgba(255, 159, 64, 1)'
-                                ],
-                                borderWidth: 1
+                                label: 'Utržená suma (Kč)',
+                                backgroundColor: 'rgb(288, 109, 132)',
+                                borderColor: 'rgb(288, 109, 232)',
+                                data: [{% for x, y in tt %} {{ y }}, {% endfor %}],
                             }]
-                        },
-                        options: {
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            }
-                        }
-                    });
-                </script>
+                            };
+
+                        const configSum = {
+                            type: 'bar',
+                            data: dataSum,
+                            options: {}
+                        };
+                        const myChartSum = new Chart(
+                            document.getElementById('myChartSum'),
+                            configSum
+                        );
+                    </script>
                 </canvas>
 
             </div>
         </div>
     </div>
-</div>
 
+</div>
+<!-- 
 <<!doctype html>
     <html lang="en">
 
@@ -165,7 +150,7 @@
                 labels: [{% for item in q %} '{{ item.day_of_sale }}', {% endfor %}],
             datasets: [{
                 label: 'Graf',//[{% for item in t %} '{{ item.product }}', {% endfor %}],
-                data: [{% for item in t %} '{{ item.sum }}', {% endfor %}],
+                data: [{% for item in t %} '{{ item.total_price }}', {% endfor %}],
                 backgroundColor: [
                     'rgba(255, 26, 104, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -288,7 +273,7 @@
         }
     });
 </script>
- -->
+ --> -->
 
 
 {% endblock %}

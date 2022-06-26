@@ -10,13 +10,16 @@ from .models import ProductType, Product, SaleType, Sale, Transaction
 from .models import MaterialType, Material, Storage, Removal
 from .models import Idea
 
-from .forms import ProductTypeForm, ProductForm, SaleTypeForm, SaleForm, TransactionForm
+from .forms import ProductTypeForm, ProductForm, SaleTypeForm, SaleForm, TransactionForm, SearchForm
 from .forms import MaterialTypeForm, MaterialForm, StorageForm, RemovalForm
 from .forms import IdeaForm
 
 from .filters import TransactionFilter
 
+from .utils import get_sales_channel_from_id, get_product_from_id, get_chart
+
 import datetime
+import pandas as pd
 
 
 
@@ -34,7 +37,7 @@ def index(response, id):
 def home(response):
     return render(response, "jp_app/home.html", {})
 
-### zobrazí všechny položky kategorie prodej
+### zobrazí všechny položky kategorie prodej ###
 def list(response):
     pt = ProductType.objects.all()
     p = Product.objects.all()
@@ -42,90 +45,54 @@ def list(response):
     s = Sale.objects.all()
     t = Transaction.objects.all()
     
-    # y = []
-    # for sale in s:
-    #     print(sale.id)
-    #     #x.append(t.filter(sales_channel__id=sale.id))
-    #     #y = {"sale": sale, "transactions": {}}
-    #     x = t.filter(sales_channel__id=sale.id)
-    #     print(x)
-    #     products_id = [z.product_id for z in x]
-    #     quantity_products = [z.quantity_of_product for z in x]
-    #     date = [z.day_of_sale for z in x]
-    #     print(products_id)
-    #     print(quantity_products)
-    #     print(date)
-    #     for d in date:
-    #         if d not in y:
-    #             y.append(d)
-    #             print(y)
-
-
-    # temp_sum = [(z.selling_price * z.quantity_of_product) for z in t]
-    # print(temp_sum)
-    q = Transaction.objects.values(
-        'day_of_sale').distinct()#.annotate(sold=Count("temp_sum"))
+    ### další část kód slouží k výpočtu tržeb po jednotlivých dnech ###
+    q = Transaction.objects.values('day_of_sale').distinct() ### uloží unikátní dny, ve kterých se uskutečnila transakce (class Transaction)
     #print(q)
-
-    # t1 = [(Transaction.objects.filter(day_of_sale=date["day_of_sale"])) for date in q]
-    # print(t1)
-    
-    temp_dict = {}
-    temp_list = []
+    tt = []
     temp1 = 0
-    for date in q:
-        t1 = Transaction.objects.filter(day_of_sale=date["day_of_sale"])
+    total = 0
+    for date in q: ### prochází postupně všechny dny, kdy se uskutečnila transakce
+        t1 = Transaction.objects.filter(day_of_sale=date["day_of_sale"]) ### uloží konkrétní den dané iterace cyklu "for"
         #print(t1)
         #print(len(t1))
         temp = 0
-        for x in range(len(t1)):
-            print(x)
-            temp2 = (t1[x]).sum()
-            print(temp2)
-            temp += (t1[x]).sum()
-            #print(temp)
-        #temp_list[str(date)] = temp
-        temp2 = q[temp1] # toto nutno upravit, aby se místo dictionary v temp_list tvořil list
-        temp2["sum"] = temp
-        print(temp2)
-        #q[temp1] = temp
-        
-        temp_list.append(temp2)
-        
+        lst = []
+        for x in range(len(t1)): ### prochází postupně všechny transakce daného dne
+            #print(x)
+            temp += (t1[x]).total_price  ### uloží utrženou částku za danou transakci
+            
+        ### We can use (*) operator to get all the values of the dictionary in a list
+        temp_value = [*(q[temp1]).values()][0] ### uloží hodnotu data aktuální iterace (* a fce values slouží k očištění daného data, aby nebylo zabaleno v listu a dalo se dále uložit)
+        lst.extend([temp_value, temp])  # přidá do dočasného listu datum z temp_value spolu s utrženou částkou v daném dni (fce"extend" je alternativou k "append" a slouží k vložení více hodnot do listu najdednou)
+        #print(lst)
+        tt.append(lst) ### vloží hodnoty z dočasného listu "lst" do finálního souhrnného listu "tt", který obsahuje všechny potřebného hodnoty pro výpis tržeb
+        total += temp ### počítá celkovou utrženou částku za všechny transakce
         temp1 += 1
+    #print(tt)
 
-    print(temp_list)
 
-    # q_list = list(q)
-    # print("konec", q_list)
-    # articles = q.values_list('day_of_sale')
-    # print(articles)
-    # print(q)
-    # print(t)
-    # print(q[0]["sum"])
-
-    # print(q.values("day_of_sale"))
     
-    # print(q[0])
-    # print(q[1])
-
-    # t2 = t1[0][0].sum()
-    # print(t2)
-    
-    tt = [[(datetime.date(2022, 6, 10)), 100], [
-            (datetime.date(2022, 6, 11)), 150]]
-
-    ### slouží k filtrování transakcí
+    ### tato část slouží k filtrování transakcí ###
     myFilter = TransactionFilter(response.GET, queryset=t) 
     t = myFilter.qs
     #print(t)
 
-    ### počítá vložené typy produktů
+    ### fce počítá součet vložené typy produktů ###
     pt_count = pt.count()
     
-    dict = {"pt": pt, "p": p, "st": st, "s": s, "t": t, "q": q,
-            "myFilter": myFilter, "pt_count": pt_count, 
-            "tt": tt}
+    dict = {
+        "pt": pt,
+        "p": p,
+        "st": st,
+        "s": s,
+        "t": t,
+        "q": q,
+        "myFilter": myFilter,
+        "pt_count": pt_count,
+        "tt": tt,  ### obsahuje všechny potřebného hodnoty pro výpis tržeb
+        "total": total,  ### celková utržená částka za všechny transakce
+        }
+    
     return render(response, "jp_app/list.html", dict)
 
 ### umožňuje vkládat všechny položky kategorie prodej
@@ -169,7 +136,7 @@ def create(response):
             p = response.POST.dict()['product']
             t = form_t.cleaned_data["day_of_sale"]
             q = form_t.cleaned_data["quantity_of_product"]
-            sp = form_t.cleaned_data["selling_price"]
+            sp = form_t.cleaned_data["product_price"]
              
             # #trans = Transaction(sales_channel=s, product=p, quantity_of_product=q)
             # print(s)
@@ -402,9 +369,109 @@ def transaction_chart(response):
     #st = Storage.objects.all()
     #r = Removal.objects.all()
 
+    
+    ### další část kód slouží k výpočtu tržeb po jednotlivých dnech ###
+    # uloží unikátní dny, ve kterých se uskutečnila transakce (class Transaction)
+    q = Transaction.objects.values('day_of_sale').distinct()
+    #print(q)
+    tt = []
+    temp1 = 0
+    total = 0
+    for date in q:  # prochází postupně všechny dny, kdy se uskutečnila transakce
+        # uloží konkrétní den dané iterace cyklu "for"
+        t1 = Transaction.objects.filter(day_of_sale=date["day_of_sale"])
+        #print(t1)
+        #print(len(t1))
+        temp = 0
+        lst = []
+        for x in range(len(t1)):  # prochází postupně všechny transakce daného dne
+            #print(x)
+            # uloží utrženou částku za danou transakci
+            temp += (t1[x]).total_price
+            #print(temp)
+            
+
+        ### We can use (*) operator to get all the values of the dictionary in a list
+        # uloží hodnotu data aktuální iterace (* a fce values slouží k očištění daného data, aby nebylo zabaleno v listu a dalo se dále uložit)
+        temp_value = [*(q[temp1]).values()][0]
+        # přidá do dočasného listu datum z temp_value spolu s utrženou částkou v daném dni (fce"extend" je alternativou k "append" a slouží k vložení více hodnot do listu najdednou)
+        lst.extend([temp_value, temp])
+        #print(lst)
+        # vloží hodnoty z dočasného listu "lst" do finálního souhrnného listu "tt", který obsahuje všechny potřebného hodnoty pro výpis tržeb
+        tt.append(lst)
+        total += temp  # počítá celkovou utrženou částku za všechny transakce
+        temp1 += 1
+
     #mt_count = mt.count()  # počet položek typ materiálu
     m_count = m.count()  # počet položek materiál
     
-    dict = {"t": t, "m": m, "m_count": m_count}
+    dict = {"t": t, "m": m, "m_count": m_count, "tt":tt}
     return render(response, "jp_app/charts.html", dict)
 
+
+def statistic(response):
+    form_stat = SearchForm(response.POST or None)
+    date_from = datetime.date(2020, 1, 1)
+    date_to = today
+    qs_tr = None
+    chart = None
+    chart_type = None
+
+    if response.method == "POST":
+        date_from = response.POST.get('date_from')
+        date_to = response.POST.get('date_to')
+        chart_type = response.POST.get('chart_type')
+        print(chart_type)
+
+    #print("1")
+    qs_tr = Transaction.objects.filter(
+        day_of_sale__lte=date_to, day_of_sale__gte=date_from)
+    df_tr = pd.DataFrame(qs_tr.values())
+
+    print("aaa", df_tr['day_of_sale'])
+
+    #print("2",qs_tr)
+    if len(qs_tr) > 0:
+        df_tr["sales_channel_id"] = df_tr["sales_channel_id"].apply(get_sales_channel_from_id) ### za pomoci funkce v souboru utils.py vymění v DataFrame u prodejního kanálu id za název
+        df_tr["product_id"] = df_tr["product_id"].apply(
+            get_product_from_id)  ### za pomoci funkce v souboru utils.py vymění v DataFrame u produktu id za název
+        df_tr["day_of_sale"] = df_tr["day_of_sale"].apply(
+            lambda x: x.strftime('%a %d.%m.%Y')) ### změní formát data v DataFrame
+        df_tr["created"] = df_tr["created"].apply(
+            lambda x: x.strftime('%d.%m.%Y'))  ### změní formát data v DataFrame
+        print(df_tr['product_price'])
+        print(df_tr['quantity_of_product'])
+        print(df_tr['total_price'])
+        
+        
+        #print("3",qs_tr)
+        df_tr.rename({   ### přejmenuje názvy vybraných sloupců v DataFrame
+            "sales_channel_id": "sales_channel",
+            "product_id": "produkt",
+        },
+            axis = 1,
+            inplace = True
+        )  
+        ### axis=1 vyjadřuje, že se pracuje se sloupcem (axis=0 by bylo v případě řádků)
+        ### inplace=True změní v DataFrame dané hodnoty a uloží nový stav
+
+    df = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum')
+    
+    #print("4", qs_tr)
+    #print("4a", df)
+    #chart = get_chart(chart_type, df_tr)
+    chart = get_chart(chart_type, df, labels=df['day_of_sale'].values)
+    #chart()
+    print("5",chart)
+
+    df_tr = df_tr.to_html()
+    df = df.to_html()
+
+    dict = {
+        "form_stat": form_stat,
+        "df_tr": df_tr,
+        "df": df,
+        "chart": chart,
+
+    }
+    return render(response, "jp_app/statistic.html", dict)
