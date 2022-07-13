@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.db.models import Sum, Count
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib import messages
 from collections import Counter
 
 from .models import ProductType, Product, SaleType, Sale, Transaction
@@ -16,7 +17,7 @@ from .forms import IdeaForm
 
 from .filters import TransactionFilter
 
-from .utils import get_sales_channel_from_id, get_product_from_id, get_chart
+from .utils import get_sales_channel_from_id, get_product_from_id, get_chart_price_days, get_chart_items_days
 
 import datetime
 import pandas as pd
@@ -44,6 +45,17 @@ def list(response):
     st = SaleType.objects.all()
     s = Sale.objects.all()
     t = Transaction.objects.all()
+
+    ### slouží k vymazání dané transakce ###
+    if response.method == "POST":
+        ### aktivace tlačítkem "delete" u příslušné transakce
+        if response.POST.get("delete_t"):
+            # převede QueryDict na dictionary "id" položky, kterou chceme smazat
+            x = response.POST.dict()['delete_t']
+            # vyhledá odpovídající transakci (dle id=x)
+            z = Transaction.objects.get(id=x)
+            z.delete()  # vymaže danou položku naskladnění
+            messages.success(response, ('Transakce byla úspěšně vymazána'))
     
     ### další část kód slouží k výpočtu tržeb po jednotlivých dnech ###
     q = Transaction.objects.values('day_of_sale').distinct() ### uloží unikátní dny, ve kterých se uskutečnila transakce (class Transaction)
@@ -90,7 +102,7 @@ def list(response):
         "myFilter": myFilter,
         "pt_count": pt_count,
         "tt": tt,  ### obsahuje všechny potřebného hodnoty pro výpis tržeb
-        "total": total,  ### celková utržená částka za všechny transakce
+        "total": total,  ### celková utržená částka za všechny transakce,
         }
     
     return render(response, "jp_app/list.html", dict)
@@ -455,22 +467,29 @@ def statistic(response):
         ### axis=1 vyjadřuje, že se pracuje se sloupcem (axis=0 by bylo v případě řádků)
         ### inplace=True změní v DataFrame dané hodnoty a uloží nový stav
 
-    df = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum')
-    
+    df = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum') ### vytvoří DataFrame s celkovými tržbami v jednotlivých dnech
+    #df = df.style.highlight_max(color='red')
+    #df = df.style.hide_index()
+    # df1 = df_tr.groupby(['produkt'], as_index=False)[
+    #      'total_price'].agg('sum')
+
     #print("4", qs_tr)
     #print("4a", df)
     #chart = get_chart(chart_type, df_tr)
-    chart = get_chart(chart_type, df, labels=df['day_of_sale'].values)
-    #chart()
-    print("5",chart)
+    chart = get_chart_price_days(
+        chart_type, df, labels=df['day_of_sale'].values)
+
+
 
     df_tr = df_tr.to_html()
     df = df.to_html()
+    #df1 = df1.to_html()
 
     dict = {
         "form_stat": form_stat,
         "df_tr": df_tr,
         "df": df,
+        # "df1": df1,
         "chart": chart,
 
     }

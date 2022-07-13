@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
-<style>
-    table,
-    th,
-    td {
-        border: 1px solid black;
-    }
-</style>
+
+<head>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+    </style>
+ </head>
+
 
 <body>
 
@@ -14,15 +21,16 @@
 
 {% block title %}Přehled produktů{% endblock %}
 
-{% load crispy_forms_tags %}
-<HR>
 {% block content %}
-<div class="p-3 mb-2 bg-info text-white">PRODUKTY</div>
+{% load crispy_forms_tags %}
+
+<br>
+<div class="p-3 mb-2 bg-dark text-white">PRODUKTY</div>
 
 <HR>
-<h2>Přehled tržeb v jednotlivých dnech</h2>
-<table class="table">
-    <thead class="thead-dark">
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled tržeb v jednotlivých dnech</strong></div>
+<table class="table table-striped table-sm">
+    <thead class="table-info">
         <tr>
             <th scope="row">Datum</th>
             <th scope="row">Utrženo</th>
@@ -31,7 +39,7 @@
     <tbody>
         {% for x, y in tt %}
         <tr>
-            <td >{{ x|date:"SHORT_DATE_FORMAT" }}</td>
+            <td >{{ x|date:'d.m.Y' }}</td>
             <td >{{ y }} Kč</td>
         {% endfor %}
         </tr>    
@@ -43,34 +51,85 @@
 </table>
 
 <HR>
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled transakcí</strong></div>
+<div class="col">
+    <div class="table-responsive">
+        <strong>Filtrování</strong>
+        <table class="table table-striped table-sm">
+            <thead class="table-secondary">
+                <tr>
+                    <form class="form-group" method="get">
+                        <th scope="col">Den prodeje {{ myFilter.form.day_of_sale }}</th>
+                        <th scope="col">Prodejní kanál {{ myFilter.form.sales_channel }}</th>
+                        <th scope="col">Produkt {{ myFilter.form.product }}</th>
+                        <th scope="col">Transakce vytvořena {{ myFilter.form.created }}</th>
+                        <th scope="col"><button class="btn btn-primary btn-sm" type="submit">Filtrovat</button></th>
+                    </form>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <form method="post" action="#">
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-striped table-sm" id="myTable1"> 
+                <!-- přidání atrubutu "id" souvisí s rozšířením jQuery (nastavený v base.html) -->
+                <thead class="table-info">
+                    <strong>Přehled</strong>
+                    <tr>
+                        <th scope="col">Den prodeje</th>
+                        <th scope="col">Prodejní kanál</th>
+                        <th scope="col">Produkt</th>
+                        <th scope="col">Prodejní cena</th>
+                        <th scope="col">Množství produktu</th>
+                        <th scope="col">Celkem utrženo</th>
+                        <th scope="col">Transakce vytvořena</th>
+                        <th scope="col">Vymazání</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in t %}
+                        <tr>
+                            <td>{{ transaction.day_of_sale|date:'d.m.Y' }}</td>
+                            <td>{{ transaction.sales_channel }}</td>
+                            <th scope="row">{{ transaction.product }}</th>
+                            <td>{{ transaction.product_price }}</td>
+                            <td>{{ transaction.quantity_of_product }}</td>
+                            <td>{{ transaction.total_price }}</td>
+                            <td>{{ transaction.created|date:'d.m.Y H:i:s' }}</td>
+                            <td><button type="submit" , name="delete_t" , value="{{transaction.id}}" , class="btn btn-danger btn-sm">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
 
-<h2>Přehled transakcí</h2>
+<HR>
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled produktů</strong></div>
 <div class="table-responsive">
-    <table class="table table-striped">
-        <thead class="thead-dark">
+    <table class="table table-striped table-sm" id="myTable2">
+        <thead class="table-info">
             <tr>
-                <form class="form-group" method="get">
-                    <th scope="col">Den prodeje {{ myFilter.form.day_of_sale }}</th>
-                    <th scope="col">Prodejní kanál {{ myFilter.form.sales_channel }}</th>
-                    <th scope="col">Produkt {{ myFilter.form.product }}</th>
-                    <th scope="col">Prodejní cena {{ myFilter.form.selling_price }}</th>
-                    <th scope="col">Množství produktu</th>
-                    <th scope="col">Celkem utrženo</th>
-                    <th scope="col">Transakce vytvořena {{ myFilter.form.created }}</th>
-                    <th scope="col"><button class="btn btn-primary" type="submit">Filtrovat</button></th>
-                </form>
+                <th scope="col">Název produktu</th>
+                <th scope="col">Typ</th>
+                <th scope="col">Výrobní náklady</th>
+                <th scope="col">J&P CANDLES</th>
+                <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
+                <th scope="col">Vytvořeno</th>
             </tr>
         </thead>
         <tbody>
-            {% for transaction in t %}
+            {% for product in p %}
                 <tr>
-                    <td>{{ transaction.day_of_sale }}</td>
-                    <td>{{ transaction.sales_channel }}</td>
-                    <th scope="row">{{ transaction.product }}</th>
-                    <td>{{ transaction.product_price }}</td>
-                    <td>{{ transaction.quantity_of_product }}</td>
-                    <td>{{ transaction.total_price }}</td>
-                    <td>{{ transaction.created }}</td>
+                    <th scope="row">{{ product.name }}</th>
+                    <td>{{ product.product_type }}</td>
+                    <td>{{ product.production_costs }}</td>
+                    <td>{{ product.jp_candles }}</td>
+                    <td>{{ product.sold }}</td>
+                    <td>{{ product.created|date:'d.m.Y H:i:s' }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -78,34 +137,7 @@
 </div>
 
 <HR>
-<h2>Přehled produktů</h2>
-<table class="table">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Název produktu</th>
-            <th scope="col">Typ</th>
-            <th scope="col">Výrobní náklady</th>
-            <th scope="col">J&P CANDLES</th>
-            <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
-            <th scope="col">Vytvořeno</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in p %}
-            <tr>
-                <th scope="row">{{ product.name }}</th>
-                <td>{{ product.product_type }}</td>
-                <td>{{ product.production_costs }}</td>
-                <td>{{ product.jp_candles }}</td>
-                <td>{{ product.sold }}</td>
-                <td>{{ product.created }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<HR>
-<h2>Přehled typů produktů</h2>
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled typů produktů</strong></div>
 <p>Počet položek: {{ pt_count }}</p>
 <ul>
     {% for product_type in pt %}
@@ -114,7 +146,7 @@
 </ul>
 
 <HR>
-<h2>Přehled prodejních kanálů</h2>
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled prodejních kanálů</strong></div>
 <ul>
     {% for sale in s %}
     <li>{{ sale.name }}</li>
@@ -122,11 +154,13 @@
 </ul>
 
 <HR>
-<h2>Přehled typů prodejních kanálů</h2>
+<div class="p-2 mb-2 bg-info text-black"><strong>Přehled typů prodejních kanálů</strong></div>
 <ul>
     {% for sale_type in st %}
     <li>{{ sale_type.name }}</li>
     {% endfor %}
 </ul>
+
+</body>
 
 {% endblock %}

@@ -7,7 +7,9 @@ Statistic
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="p-3 mb-2 bg-info text-white">STATISTIKY PRODEJE</div>
+
+<br>
+<div class="p-3 mb-2 bg-dark text-white">STATISTIKY PRODEJE</div>
 
 <form method="post" action="/statistic/">
     <div class="form-row">
@@ -16,19 +18,25 @@ Statistic
         {{form_stat|crispy}}
                               
     </div>
-    <button type="submit", class="btn btn-secondary btn-lg btn-block">Zobrazit</button>
+    <button type="submit", class="btn btn-secondary btn-lg btn-block">Zobrazit graf</button>
 </form>
+
+<hr>
+
+<img src="data:image/png;base64, {{chart|safe}}">
 
 <hr>
 
 {{df_tr|safe}}
 
-<hr>
+
 
 {{df|safe}}
 
-<hr>
 
-<img src="data:image/png;base64, {{chart|safe}}">
+
+{{df1|safe}}
+
+
 
 {% endblock %}

@@ -5,18 +5,26 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+<br>
 <div class="p-3 mb-2 bg-info text-white">NÁPADY</div>
 
 <hr>
-<h2>Tvorba nápadu</h2>
-<div class="form-row align-items-center">
-    <div class="col-auto">
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-success">Přidat</button>
-        </form>
+
+<div class="col">
+    <div class="card text-white bg-success">
+        <div class="card-body">
+            <h5 class="card-title">Tvorba nápadu</h5>
+            <p class="card-text">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-dark">Přidat</button>
+                </form>
+            </p>
+        </div>
     </div>
+</div>
 </div>
 
 

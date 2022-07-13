@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from django.conf.global_settings import DATETIME_INPUT_FORMATS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -119,6 +120,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+# USE_L10N = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -138,3 +141,7 @@ LOGOUT_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+USE_THOUSAND_SEPARATOR = True # bude se používat oddělení čárkou mezi tisíci u čísel
+
+DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S'] # '2006-10-25 14:30:59'

@@ -4,6 +4,9 @@ from jp_app.models import ProductType, Product, SaleType, Sale, Transaction
 from jp_app.models import MaterialType, Material, Storage, Removal
 from jp_app.models import Idea
 
+import datetime
+from datetime import date
+
 
 ###   PRODEJ   ###
 
@@ -63,7 +66,7 @@ class SearchForm(forms.Form):
     )
 
     date_from = forms.DateField(widget=DateInput)
-    date_to = forms.DateField(widget=DateInput)
+    date_to = forms.DateField(widget=DateInput, initial=date.today)
     chart_type = forms.ChoiceField(choices=CHART_CHOICES)
 
 
@@ -109,7 +112,7 @@ class IdeaForm(ModelForm):
             'product_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
             'production_costs': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Výrobní náklady'}),
             'selling_price': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Prodejní cena'}),
-            'introduction_day': forms.DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'rrrr-mm-dd'}),
+            'introduction_day': forms.DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Select a date', 'type': 'date'}),
             'status': forms.Select(attrs={'class': 'form-control form-control-sm'}),
             'note': forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
         }

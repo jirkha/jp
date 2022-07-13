@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 import datetime
+from datetime import date
 
 # Create your models here.
 
@@ -64,14 +65,14 @@ class Sale(models.Model):  # typ prodejního kanálu
 
 
 class Transaction(models.Model):  # transakce
-    day_of_sale = models.DateField()  # datum transakce
+    day_of_sale = models.DateField(default=date.today)  # datum transakce
     # prodejní kanál
     sales_channel = models.ForeignKey(
         Sale, related_name="sales", on_delete=models.CASCADE)
     product = models.ForeignKey(
         Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
     product_price = models.FloatField(default=0)  # prodejní cena za 1 ks / produkt
-    quantity_of_product = models.IntegerField()  # množství prodaného produktu
+    quantity_of_product = models.IntegerField(default=1)  # množství prodaného produktu
     total_price = models.FloatField(blank=True) #, default=0)
     # automaticky doplní čas přidání transakce
     created = models.DateTimeField(auto_now_add=True)

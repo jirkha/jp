@@ -18,12 +18,15 @@
 
 {% block content %}
 
-<div class="p-3 mb-2 bg-info text-white">NÁPADY</div>
+<br>
 
-<h2>Seznam nápadů</h2>
+<div class="p-3 mb-2 bg-dark text-white">NÁPADY</div>
+
+<div class="p-2 mb-2 bg-info text-black"><strong>Seznam nápadů</strong></div>
 <p>Celkový počet položek: {{ object_list.count }}</p>
-<table class="table">
-    <thead class="thead-dark">
+<div class="table-responsive">
+<table class="table table-striped table-sm">
+    <thead class="table-info">
         <tr>
             <th scope="col">Název produktu</th>
             <th scope="col">Typ produktu</th>
@@ -42,13 +45,14 @@
                 <td>{{ post.product_type }}</td>
                 <td>{{ post.production_costs }}</td>
                 <td>{{ post.selling_price }}</td>
-                <td>{{ post.introduction_day }}</td>
+                <td>{{ post.introduction_day|date:'d.m.Y' }}</td>
                 <td>{{ post.status }}</td>
-                <td><a href="{% url 'jp_app:idea_update' post.pk %}" class="btn btn-info">Editovat</a></td>
-                <td><a href="{% url 'jp_app:idea_delete' post.pk %}" class="btn btn-danger">Smazat</a></td>
+                <td><a href="{% url 'jp_app:idea_update' post.pk %}" class="btn btn-info btn-sm">Editovat</a></td>
+                <td><a href="{% url 'jp_app:idea_delete' post.pk %}" class="btn btn-danger btn-sm">Smazat</a></td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 {% endblock %}

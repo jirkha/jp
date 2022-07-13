@@ -6,10 +6,29 @@
 
 {% block content %}
 
-<div class="p-3 mb-2 bg-info text-white">PRUDUKTY</div>
+<br>
+
+<div class="p-3 mb-2 bg-dark text-white">PRUDUKTY</div>
 
 <hr>
+<div class="row">
+    <div class="col">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Zadání transakce</h5>
+                <p class="card-text">
+                <form method="post" action="/create/" class="form-group">
+                    {% csrf_token %}
+                    {{form_t|crispy}}
+                    <button type="submit" , name="save_t" , value="t" , class="btn btn-dark">Vložit</button>
+                </form>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
+<hr>
 <div class="row">
     <div class="col-sm-6">
         <div class="card bg-secondary text-white">
@@ -70,26 +89,6 @@
         </div>
     </div>
 
-</div>
-
-<hr>
-
-<div class="row">
- 
-    <div class="col">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Zadání transakce</h5>
-                <p class="card-text">
-                <form method="post" action="/create/" class="form-group">
-                    {% csrf_token %}
-                    {{form_t|crispy}}
-                    <button type="submit" , name="save_t" , value="t" , class="btn btn-dark">Vložit</button>
-                </form>
-                </p>
-            </div>
-        </div>
-    </div>
 </div>
 
 {% endblock %}

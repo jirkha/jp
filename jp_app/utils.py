@@ -31,22 +31,39 @@ def get_graph():
     return graph
 
 
-### sestaví graf vykreslený pomocí views.py > statistic
-def get_chart(chart_type, data, **kwargs):
+### sestaví graf tržeb v jednotlivých dnech vykreslený pomocí views.py > statistic
+def get_chart_price_days(chart_type, data, **kwargs):
     plt.switch_backend('AGG')
     fig = plt.figure(figsize=(10,4)) ### nastaví velikost grafů
     
     if chart_type == 'Bar chart':
         print("bar chart")
-        #plt.bar(data['day_of_sale'], data['total_price'])
-        sns.barplot(x='day_of_sale', y='total_price', data=data)
+        plt.bar(data['day_of_sale'], data['total_price'])
+        #sns.barplot(x='day_of_sale', y='total_price', data=data)
     elif chart_type == 'Pie chart':
         labels = kwargs.get('labels')
         plt.pie(data=data, x='total_price', labels=labels)
     elif chart_type == 'Line chart':
         print("line chart")
-        plt.plot(data['day_of_sale'], data['total_price'])
+        plt.plot(data['day_of_sale'], data['total_price'], label = "line1")
+        plt.plot(data['day_of_sale'],
+                 data['total_price'], label="line2") ### line2 na zkoušku - vzor pro budoucí uplatnění
     
+    plt.tight_layout()
+    #plt.legend(("line1", "line2"),('oscillatory', 'damped'))
+    chart = get_graph()
+
+    return chart
+
+
+
+### sestaví graf tržeb v jednotlivých dnech vykreslený pomocí views.py > statistic
+def get_chart_items_days(data, **kwargs):
+    plt.switch_backend('AGG')
+    fig = plt.figure(figsize=(10, 4))  # nastaví velikost grafů
+    print("line chart")
+    plt.plot(data['day_of_sale'], data['total_price'])
+
     plt.tight_layout()
     chart = get_graph()
 
