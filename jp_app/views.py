@@ -17,11 +17,22 @@ from .forms import IdeaForm
 
 from .filters import TransactionFilter
 
-from .utils import get_sales_channel_from_id, get_product_from_id, get_chart_price_days, get_chart_items_days
+from .utils import (
+    get_sales_channel_from_id,
+    get_product_from_id, 
+    get_chart_price_days, 
+    get_chart_items_days, 
+    get_chart_price_months
+)
+    
 
 import datetime
 import pandas as pd
 
+### google drive
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+import os
 
 
 
@@ -91,6 +102,8 @@ def list(response):
 
     ### fce počítá součet vložené typy produktů ###
     pt_count = pt.count()
+
+
     
     dict = {
         "pt": pt,
@@ -103,7 +116,7 @@ def list(response):
         "pt_count": pt_count,
         "tt": tt,  ### obsahuje všechny potřebného hodnoty pro výpis tržeb
         "total": total,  ### celková utržená částka za všechny transakce,
-        }
+         }
     
     return render(response, "jp_app/list.html", dict)
 
@@ -433,30 +446,20 @@ def statistic(response):
         date_from = response.POST.get('date_from')
         date_to = response.POST.get('date_to')
         chart_type = response.POST.get('chart_type')
-        print(chart_type)
 
-    #print("1")
     qs_tr = Transaction.objects.filter(
         day_of_sale__lte=date_to, day_of_sale__gte=date_from)
     df_tr = pd.DataFrame(qs_tr.values())
 
-    print("aaa", df_tr['day_of_sale'])
-
-    #print("2",qs_tr)
     if len(qs_tr) > 0:
         df_tr["sales_channel_id"] = df_tr["sales_channel_id"].apply(get_sales_channel_from_id) ### za pomoci funkce v souboru utils.py vymění v DataFrame u prodejního kanálu id za název
         df_tr["product_id"] = df_tr["product_id"].apply(
             get_product_from_id)  ### za pomoci funkce v souboru utils.py vymění v DataFrame u produktu id za název
-        df_tr["day_of_sale"] = df_tr["day_of_sale"].apply(
-            lambda x: x.strftime('%a %d.%m.%Y')) ### změní formát data v DataFrame
+        # df_tr["day_of_sale"] = df_tr["day_of_sale"].apply(
+        #     lambda x: x.strftime('%a %d.%m.%Y')) ### změní formát data v DataFrame
         df_tr["created"] = df_tr["created"].apply(
             lambda x: x.strftime('%d.%m.%Y'))  ### změní formát data v DataFrame
-        print(df_tr['product_price'])
-        print(df_tr['quantity_of_product'])
-        print(df_tr['total_price'])
-        
-        
-        #print("3",qs_tr)
+               
         df_tr.rename({   ### přejmenuje názvy vybraných sloupců v DataFrame
             "sales_channel_id": "sales_channel",
             "product_id": "produkt",
@@ -467,30 +470,80 @@ def statistic(response):
         ### axis=1 vyjadřuje, že se pracuje se sloupcem (axis=0 by bylo v případě řádků)
         ### inplace=True změní v DataFrame dané hodnoty a uloží nový stav
 
-    df = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum') ### vytvoří DataFrame s celkovými tržbami v jednotlivých dnech
-    #df = df.style.highlight_max(color='red')
-    #df = df.style.hide_index()
-    # df1 = df_tr.groupby(['produkt'], as_index=False)[
-    #      'total_price'].agg('sum')
+    df_d = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum') ### vytvoří DataFrame s celkovými tržbami v jednotlivých dnech
+    #df_d = df_d.style.highlight_max(color='red')
+    #df_d = df_d.style.hide_index()
+    
+    ### nastaví správný formát datumů u hodnot ve sloupci "day_of_sale" pro účely indexování v dalších krocích
+    df_temp = df_d.set_index(pd.DatetimeIndex(df_d['day_of_sale']), drop=False)
+    #df_temp = df_d
+    #df_temp["day_of_sale_2"] = pd.to_datetime(df_d['day_of_sale'])
+    print("df_temp: ", df_temp)
+    print("df_temp['day_of_sale_2']: ", df_temp["day_of_sale_2"])
+    
+    ### vytvoří DataFrame se součtem tržeb dle jednotlivých měsíců
+    df_m = df_temp.groupby([df_temp.index.year, df_temp.index.month]).sum()
+    
+    #df_m = df_temp.groupby([df_temp["day_of_sale"].dt.year, df_temp["day_of_sale"].dt.month], as_index=False).sum()
 
-    #print("4", qs_tr)
-    #print("4a", df)
+    print(df_m)
+
+    
+    # temp_value = [*(df_m.index)]
+    # print("temp_value:", temp_value)
+    # for temp in df_m.index:
+    #     print("temp:", temp)
+    #     return str(temp.index.year.values) + "-" + str(temp.index.month.values)
+    
+    ### vytvoří DataFrame se součtem tržeb dle jednotlivých let
+    df_y = None #df_temp.groupby(df_temp.index.year.values).sum()
+    
+
     #chart = get_chart(chart_type, df_tr)
-    chart = get_chart_price_days(
-        chart_type, df, labels=df['day_of_sale'].values)
+    chart_d = get_chart_price_days(
+        chart_type, df_d, labels=df_d['day_of_sale'].values)
+    
+    chart_m = None #get_chart_price_months(chart_type, df_m, labels=df_m.index.values)
 
-
-
+    
     df_tr = df_tr.to_html()
-    df = df.to_html()
-    #df1 = df1.to_html()
+    df_d = df_d.to_html()
+    df_m = df_m.to_html()
+    #df_y = df_y.to_html()
+
 
     dict = {
         "form_stat": form_stat,
         "df_tr": df_tr,
-        "df": df,
-        # "df1": df1,
-        "chart": chart,
+        "df_d": df_d,
+        "df_m": df_m,
+        "df_y": df_y,
+        "chart_d": chart_d,
+        "chart_m": chart_m,
 
     }
     return render(response, "jp_app/statistic.html", dict)
+
+
+
+
+### GOOGLE ###
+
+
+
+def google(response):
+    g_login = GoogleAuth()
+    g_login.LocalWebserverAuth()
+    drive = GoogleDrive(g_login)
+    
+    # # to check the current working directory, if the current working directory above is different than your folder containing the script then change the working directory to your script directory.
+    # print(os.getcwd())
+
+    # file = drive.CreateFile({'title': 'My Awesome File.txt'})
+    # # this writes a string directly to a file
+    # file.SetContentString('Hello World!')
+    # # SetContentFile( název souboru ) => alternativa ke "SetContentString", která jako obsah vloží obsah jiného souboru
+    # file.Upload()
+    
+    dict = {}
+    return render(response, "jp_app/google.html", dict)

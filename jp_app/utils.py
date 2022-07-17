@@ -55,6 +55,29 @@ def get_chart_price_days(chart_type, data, **kwargs):
 
     return chart
 
+### sestaví graf tržeb v jednotlivých dnech vykreslený pomocí views.py > statistic
+
+
+def get_chart_price_months(chart_type, data, **kwargs):
+    plt.switch_backend('AGG')
+    fig = plt.figure(figsize=(10, 4))  # nastaví velikost grafů
+
+    if chart_type == 'Bar chart':
+        print("bar chart")
+        plt.bar(data.index, data['total_price'])
+        #sns.barplot(x='day_of_sale', y='total_price', data=data)
+    elif chart_type == 'Pie chart':
+        labels = kwargs.get('labels')
+        plt.pie(data=data, x='total_price', labels=labels)
+    elif chart_type == 'Line chart':
+        print("line chart")
+        plt.plot(data.index, data['total_price'], label="line1")
+       
+    plt.tight_layout()
+    #plt.legend(("line1", "line2"),('oscillatory', 'damped'))
+    chart = get_graph()
+
+    return chart
 
 
 ### sestaví graf tržeb v jednotlivých dnech vykreslený pomocí views.py > statistic

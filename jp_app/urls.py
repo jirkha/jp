@@ -14,6 +14,7 @@ urlpatterns = [
     path("create/", views.create, name="create"),
     path("material/", views.material, name="material"),
     path("list_material/", views.list_material, name="list_material"),
+    path("google/", views.google, name="google"),
     path("idea/", IdeaView.as_view(), name="idea"),
     path("idea/<int:pk>", IdeaDetailView.as_view(), name="idea-detail"),
     path("idea_update/<int:pk>", UpdateIdea.as_view(), name="idea_update"),
