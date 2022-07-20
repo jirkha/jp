@@ -1,9 +1,11 @@
+import json
 from .models import Sale, Product
 
 import base64
 from io import BytesIO
 import matplotlib.pyplot as plt
 import seaborn as sns
+import datetime
 
 ### POMOCNÉ FUNKCE ###
 
@@ -91,3 +93,18 @@ def get_chart_items_days(data, **kwargs):
     chart = get_graph()
 
     return chart
+
+
+### nastaví správný formát data (bez uvedení času) v Json
+def get_json(df):
+    """ Small function to serialise DataFrame dates as 'YYYY-MM-DD' in JSON """
+
+    def convert_timestamp(item_date_object):
+        if isinstance(item_date_object, (datetime.date, datetime.datetime)):
+            return item_date_object.strftime("%Y-%m-%d")
+
+    dict_ = df.to_dict(orient='records')
+
+    return json.dumps(dict_, default=convert_timestamp)
+
+

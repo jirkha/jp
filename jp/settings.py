@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'cs'
 
 TIME_ZONE = 'UTC'
 
@@ -142,6 +142,6 @@ LOGOUT_REDIRECT_URL = "/"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-USE_THOUSAND_SEPARATOR = True # bude se používat oddělení čárkou mezi tisíci u čísel
+USE_THOUSAND_SEPARATOR = False # nebude se používat oddělení čárkou mezi tisíci u čísel
 
 DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S'] # '2006-10-25 14:30:59'

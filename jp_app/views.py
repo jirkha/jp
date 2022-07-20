@@ -22,12 +22,14 @@ from .utils import (
     get_product_from_id, 
     get_chart_price_days, 
     get_chart_items_days, 
-    get_chart_price_months
+    get_chart_price_months,
+    get_json,
 )
     
 
 import datetime
 import pandas as pd
+import json
 
 ### google drive
 from pydrive.auth import GoogleAuth
@@ -474,31 +476,25 @@ def statistic(response):
     #df_d = df_d.style.highlight_max(color='red')
     #df_d = df_d.style.hide_index()
     
-    ### nastaví správný formát datumů u hodnot ve sloupci "day_of_sale" pro účely indexování v dalších krocích
-    df_temp = df_d.set_index(pd.DatetimeIndex(df_d['day_of_sale']), drop=False)
-    #df_temp = df_d
-    #df_temp["day_of_sale_2"] = pd.to_datetime(df_d['day_of_sale'])
-    print("df_temp: ", df_temp)
-    print("df_temp['day_of_sale_2']: ", df_temp["day_of_sale_2"])
+    ### TVORBA SUMÁŘE TRŽEB DLE MĚSÍCŮ A LET ###
     
-    ### vytvoří DataFrame se součtem tržeb dle jednotlivých měsíců
-    df_m = df_temp.groupby([df_temp.index.year, df_temp.index.month]).sum()
-    
-    #df_m = df_temp.groupby([df_temp["day_of_sale"].dt.year, df_temp["day_of_sale"].dt.month], as_index=False).sum()
-
-    print(df_m)
-
-    
-    # temp_value = [*(df_m.index)]
-    # print("temp_value:", temp_value)
-    # for temp in df_m.index:
-    #     print("temp:", temp)
-    #     return str(temp.index.year.values) + "-" + str(temp.index.month.values)
-    
+    ### vytvoří nový DataFrame a nastaví správný formát datumů u hodnot ve sloupci "day_of_sale" a umístí ho do indexu tabulky (pro účely dalšího zpracování dat)
+    df_m = df_d.set_index(pd.DatetimeIndex(df_d['day_of_sale']), drop=False)
     ### vytvoří DataFrame se součtem tržeb dle jednotlivých let
-    df_y = None #df_temp.groupby(df_temp.index.year.values).sum()
-    
+    df_y = df_m.groupby(df_m.index.year.values).sum()
+    ### resetuje index -> z indexu obsahující údaj o roku udělá sloupec s názvem "index", jehož údaj se následně bude zobrazovat
+    df_y = df_y.reset_index()
+    ### seskupí DataFrame dle jednotlivých měsíců a sečte celkové tržby za daný měsíc
+    df_m = df_m.groupby([df_m.index.year, df_m.index.month]).sum()
+    ### přejmenuje indexy, aby se s nimi dalo dále pracovat
+    df_m.index.names = ["year_of_sale","month_of_sale"] 
+    ### přejmenuje sloupce a z indexů "year_of_sale" a "month_of_sale" udělá sloupce, z jejichž dat se následně zobrazí číslo daného měsíce a rok
+    df_m = df_m.rename(columns={'day_of_sale': 'day', 'total_price': 'price'}).reset_index()
+    ### pomocné printy (možno smazat)
+    print("df_m:", df_m)
+    print("df_y:", df_y)
 
+   
     #chart = get_chart(chart_type, df_tr)
     chart_d = get_chart_price_days(
         chart_type, df_d, labels=df_d['day_of_sale'].values)
@@ -506,10 +502,26 @@ def statistic(response):
     chart_m = None #get_chart_price_months(chart_type, df_m, labels=df_m.index.values)
 
     
-    df_tr = df_tr.to_html()
-    df_d = df_d.to_html()
-    df_m = df_m.to_html()
+    #df_tr = df_tr.to_html()
+    #df_d = df_d.to_html()
+    #df_m = df_m.to_html()
     #df_y = df_y.to_html()
+    
+    # json_records_x vyvolá funkci v unit.py, která nastaví správný výstupní fpormát čas (Json)
+    json_records_d = get_json(df_d)
+    json_records_m = get_json(df_m)
+    json_records_y = get_json(df_y)
+    #json_records = df_d.reset_index().to_json(date_format='iso', orient='records')
+    print("json_records_d:", json_records_d)
+    print("json_records_m:", json_records_m)
+    print("json_records_y:", json_records_y)
+    
+    df_m = []
+    df_m = json.loads(json_records_m)
+    df_d = []
+    df_d = json.loads(json_records_d)
+    df_y = []
+    df_y = json.loads(json_records_y)
 
 
     dict = {
@@ -520,7 +532,7 @@ def statistic(response):
         "df_y": df_y,
         "chart_d": chart_d,
         "chart_m": chart_m,
-
+        #"arr": arr,
     }
     return render(response, "jp_app/statistic.html", dict)
 

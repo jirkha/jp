@@ -24,12 +24,12 @@
 {% block content %}
 {% load crispy_forms_tags %}
 
-{{ gauth }}
+{% comment %} {{ gauth }}
 {% gauth %}
 {{ drive }}
 {% drive %}
 {{ file }}
-{% file %}
+{% file %} {% endcomment %}
 
 <br>
 <div class="p-3 mb-2 bg-dark text-white">PRODUKTY</div>
