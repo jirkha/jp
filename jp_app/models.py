@@ -19,16 +19,28 @@ class ProductType(models.Model):  # typ produktu
         return f"{self.name}"
 
 
+class Item(models.Model):  # položka (součást) produktu
+    name = models.CharField(max_length=256)  # název položky
+    # cena za danou součást prduktu (nikoliv za měrnou jednotku, ale za celý produkt
+    costs = models.IntegerField()
+    note = models.TextField(blank=True)  # poznámka
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name}, ({self.costs} Kč)"
+
 class Product(models.Model): # prudukt (výrobek k prodeji)
     name = models.CharField(max_length=256)  # název produktu
     # typ produktu (svíčka / vonný vosk / difuzér atd.)
     product_type = models.ForeignKey(
         ProductType, related_name="product_types", on_delete=models.CASCADE) # volba tyupu produktu
-    production_costs = models.IntegerField()  # výrobní náklady
+    items = models.ManyToManyField(Item, related_name="productsit", blank=True, default=[]) ### součásti daného produktu
+    production_costs = models.IntegerField(default=0)  # výrobní náklady, které se spočítají automaticky na základě položek "items"
     # prodaných ks / prodané množství (nezadává se při tvorbě produktu, ale automaticky při transakci)
     sold = models.IntegerField(default=0)
     # uvádí (a/n), zda se jedná o výrobek pod značkou J&P CANDLES nebo pod jinou značkou (externí spolupráce)
     jp_candles = models.BooleanField(default=True)
+    note = models.TextField(blank=True)  # poznámka
     # automaticky doplní čas přidání produktu
     created = models.DateTimeField(auto_now_add=True)
 
@@ -38,8 +50,13 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
     def __str__(self):
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"
         return f"{self.name}"
+        # umožňuje proklik ze seznamu nápadů na detail daného nápadu
 
+    def get_absolute_url(self):
+        # return reverse('idea-detail', args=(str(self.id)))
+        return reverse('jp_app:product-detail', args=[self.id])
 
+    
 class SaleType(models.Model):  # typ prodejního kanálu
     # název typu prodejního kanálu (# trh / eshop / komisní prodej / kamenný obchod / externí spolupráce apod.)
     name = models.CharField(max_length=256)
@@ -71,9 +88,10 @@ class Transaction(models.Model):  # transakce
         Sale, related_name="sales", on_delete=models.CASCADE)
     product = models.ForeignKey(
         Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
-    product_price = models.FloatField(default=0)  # prodejní cena za 1 ks / produkt
+    # prodejní cena za 1 ks / produkt
+    product_price = models.IntegerField(default=0)
     quantity_of_product = models.IntegerField(default=1)  # množství prodaného produktu
-    total_price = models.FloatField(blank=True) #, default=0)
+    total_price = models.IntegerField(blank=True)  # , default=0)
     # automaticky doplní čas přidání transakce
     created = models.DateTimeField(auto_now_add=True)
 

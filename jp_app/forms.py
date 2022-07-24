@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from jp_app.models import ProductType, Product, SaleType, Sale, Transaction
+from jp_app.models import ProductType, Product, Item, SaleType, Sale, Transaction
 from jp_app.models import MaterialType, Material, Storage, Removal
 from jp_app.models import Idea
 
@@ -26,7 +26,24 @@ class ProductTypeForm(ModelForm):
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ["name", "product_type", "production_costs", "jp_candles"]
+        fields = ["name", "product_type", "items", "jp_candles", "note"]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název produktu'}),
+            'product_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'items': forms.SelectMultiple(attrs={'class': 'form-control form-control-sm'}),
+            'jp_candles': forms.NullBooleanSelect(attrs={'class': 'form-control form-control-sm'}),
+            'note': forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
+        }
+        
+class ItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = ["name", "costs", "note"]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název položky'}),
+            'costs': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Cena za položku (celkem)'}),
+            'note': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 1, 'cols': 1, 'placeholder': 'Poznámka (volitelné)'}),
+        }
 
 class SaleTypeForm(ModelForm):
     class Meta:
@@ -65,9 +82,16 @@ class SearchForm(forms.Form):
         ('Line chart', 'Line chart')
     )
 
+    PERIOD_CHOICES = (
+        ('Days', 'Dny'),
+        ('Months', 'Měsíce'),
+        ('Years', 'Roky')
+    )
+
     date_from = forms.DateField(widget=DateInput)
     date_to = forms.DateField(widget=DateInput, initial=date.today)
     chart_type = forms.ChoiceField(choices=CHART_CHOICES)
+    period = forms.ChoiceField(choices=PERIOD_CHOICES)
 
 
 ###   SKLAD   ###

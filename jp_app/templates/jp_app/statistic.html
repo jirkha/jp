@@ -32,94 +32,97 @@ Statistic
 
 <form method="post" action="/statistic/">
     <div class="form-row">
+        <input class=""
         
         {% csrf_token %}
         {{form_stat|crispy}}
                               
     </div>
-    <button type="submit", class="btn btn-secondary btn-lg btn-block">Zobrazit graf</button>
+    <button type="submit", class="btn btn-info btn-md btn-block">Zobrazit graf</button>
 </form>
 
 <hr>
 
-<img src="data:image/png;base64, {{chart_d|safe}}">
-<img src="data:image/png;base64, {{chart_m|safe}}">
-
+<img src="data:image/png;base64, {{chart|safe}}">
 
 <hr>
 
-<div class="p-2 mb-2 bg-info text-black"><strong>Denní přehled tržeb</strong></div>
-<table class="table table-striped table-sm" id="myTable">
-    <thead class="table-info">
-        <tr>
-            <th scope="col">Datum</th>
-            <th scope="col">Utrženo</th>
-                    
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in df_d %}
-            <tr>
-                <th scope="row">{{ t.day_of_sale|safe }}</th>
-                <td>{{ t.total_price }}</td>
-       
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-4 col-12">
+        <div class="card" style="margin-top:30px;">
+            <div class="card-body">
+                <div class="p-2 mb-2 bg-info text-black"><strong>Denní přehled tržeb za zvolené období</strong></div>
+                <table class="table table-striped table-sm" id="myTable">
+                    <thead class="table-info">
+                        <tr>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Utrženo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in df_d %}
+                        <tr>
+                            <th scope="row">{{ t.day_of_sale|safe }}</th>
+                            <td>{{ t.total_price }} Kč</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-12">
+        <div class="card" style="margin-top:30px;">
+            <div class="card-body">
+                <div class="p-2 mb-2 bg-info text-black"><strong>Měsíční přehled tržeb za zvolené období</strong></div>
+                <table class="table table-striped table-sm" id="myTable1">
+                    <thead class="table-info">
+                        <tr>
+                            <th scope="col">Měsíc</th>
+                            <th scope="col">Utrženo</th>
+                
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in df_m %}
+                        <tr>
+                            <th scope="row">{{ t.month_of_sale }}/{{ t.year_of_sale }}</th>
+                            <td>{{ t.total_price }}</td>
+                
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-12">
+        <div class="card" style="margin-top:30px;">
+            <div class="card-body">
+                <div class="p-2 mb-2 bg-info text-black"><strong>Roční přehled tržeb za zvolené období</strong></div>
+                <table class="table table-striped table-sm" id="myTable2">
+                    <thead class="table-info">
+                        <tr>
+                            <th scope="col">Rok</th>
+                            <th scope="col">Utrženo</th>
+                
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in df_y %}
+                        <tr>
+                            <th scope="row">{{ t.index }}</th>
+                            <td>{{ t.total_price }}</td>
+                
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-<hr>
-
-<div class="p-2 mb-2 bg-info text-black"><strong>Měsíční přehled tržeb</strong></div>
-<table class="table table-striped table-sm" id="myTable1">
-    <thead class="table-info">
-        <tr>
-            <th scope="col">Měsíc</th>
-            <th scope="col">Utrženo</th>
-                    
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in df_m %}
-            <tr>
-                <th scope="row">{{ t.month_of_sale }}/{{ t.year_of_sale }}</th>
-                <td>{{ t.price }}</td>
-       
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<hr>
-
-<div class="p-2 mb-2 bg-info text-black"><strong>Roční přehled tržeb</strong></div>
-<table class="table table-striped table-sm" id="myTable1">
-    <thead class="table-info">
-        <tr>
-            <th scope="col">Rok</th>
-            <th scope="col">Utrženo</th>
-                    
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in df_y %}
-            <tr>
-                <th scope="row">{{ t.index }}</th>
-                <td>{{ t.total_price }}</td>
-       
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-
-{{df_tr|safe}}
-
-{{df_d|safe}}
-
-{{df_m|safe}}
-
-{{df_y|safe}}
 
 
 </body>

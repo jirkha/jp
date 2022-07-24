@@ -7,11 +7,11 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from collections import Counter
 
-from .models import ProductType, Product, SaleType, Sale, Transaction
+from .models import ProductType, Product, Item, SaleType, Sale, Transaction
 from .models import MaterialType, Material, Storage, Removal
 from .models import Idea
 
-from .forms import ProductTypeForm, ProductForm, SaleTypeForm, SaleForm, TransactionForm, SearchForm
+from .forms import ProductTypeForm, ProductForm, ItemForm, SaleTypeForm, SaleForm, TransactionForm, SearchForm
 from .forms import MaterialTypeForm, MaterialForm, StorageForm, RemovalForm
 from .forms import IdeaForm
 
@@ -20,9 +20,7 @@ from .filters import TransactionFilter
 from .utils import (
     get_sales_channel_from_id,
     get_product_from_id, 
-    get_chart_price_days, 
-    get_chart_items_days, 
-    get_chart_price_months,
+    get_chart_price,
     get_json,
 )
     
@@ -50,6 +48,71 @@ def index(response, id):
 ### zobrazí domovskou stránku (aktuálně bez obsahu)
 def home(response):
     return render(response, "jp_app/home.html", {})
+
+
+class ProductView(ListView):
+    model = Product
+    template_name = 'jp_app/product/product.html'
+    ordering = ['-created']  # seřadí seznam produktů sestupně dle "data vložení"
+
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'jp_app/product/product-detail.html'
+
+
+### automaticky (pomocí CreateView) načte formulář sloužící k vložení produktů
+class CreateProduct(CreateView):
+    model = Product  # models.py
+    form_class = ProductForm  # forms.py
+    # pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
+    template_name = 'jp_app/product/product_add.html'
+    # template_name = 'jp_app/idea_add.html'
+    # fields = '__all__'
+    
+
+class UpdateProduct(UpdateView):
+    model = Product
+    form_class = ProductForm  # forms.py
+    # pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
+    template_name = 'jp_app/product/product_update.html'
+    # fields = '__all__'
+
+
+class DeleteProduct(DeleteView):
+    model = Product
+    template_name = 'jp_app/product/product_delete.html'
+    # 'reverse_lazy' slouží k určení stránky, na kterou po smazání nápadu bude přesměrováno
+    success_url = reverse_lazy('jp_app:product')
+
+### vytvoří a zobrazí seznam "items", tzn. jednotlivých položek, ze kterých se skládají produkty
+def item(response):
+    i = Item.objects.all()
+    i_count = i.count()  ### fce počítá součet vložené typy produktů
+    form_i = ItemForm()
+    
+    if response.method == "POST":
+        if "save_i" in response.POST: 
+            form_i = ItemForm(response.POST)
+            if form_i.is_valid():
+                form_i.save()
+        if response.POST.get("delete_i"):
+            # převede QueryDict na dictionary "id" položky, kterou chceme smazat
+            x = response.POST.dict()['delete_i']
+            # vyhledá odpovídající transakci (dle id=x)
+            z = Item.objects.get(id=x)
+            z.delete()  # vymaže danou položku naskladnění
+            messages.success(response, ('Item byla úspěšně vymazán'))
+    
+    
+    dict = {
+        "i": i,
+        "i_count": i_count,
+        "form_i": form_i,
+      }
+
+    return render(response, "jp_app/product/item.html", dict)
+
 
 ### zobrazí všechny položky kategorie prodej ###
 def list(response):
@@ -95,7 +158,8 @@ def list(response):
         temp1 += 1
     #print(tt)
 
-
+    print(p)
+    print(Product.objects.values_list('name','items'))
     
     ### tato část slouží k filtrování transakcí ###
     myFilter = TransactionFilter(response.GET, queryset=t) 
@@ -117,7 +181,7 @@ def list(response):
         "myFilter": myFilter,
         "pt_count": pt_count,
         "tt": tt,  ### obsahuje všechny potřebného hodnoty pro výpis tržeb
-        "total": total,  ### celková utržená částka za všechny transakce,
+        "total": total,  ### celková utržená částka za všechny transakce
          }
     
     return render(response, "jp_app/list.html", dict)
@@ -326,65 +390,12 @@ def material(response):
 
 
 
-
-###   NÁPADY   ###
-
-
-### automaticky (pomocí ListView) načte seznam nápadů vložených pomocí "CreateIdea"
-### jednodušší alternativa k řešení pomocí funkcí (viz výše)
-class IdeaView(ListView):
-    model = Idea
-    template_name = 'jp_app/idea.html'
-    ordering = ['-created'] ### seřadí seznam nápadů sestupně dle "data vložení"
-
-    ### slouží k sečtení celkového počtu vložených položek "nápady" a následnému zobrazení na stránce
-    def idea(self, response):
-        i = Idea.objects.all()
-
-        i_count = i.count()
-        print(i_count)
-
-        dict = {
-           "i_count": i_count,
-        }
-        return render(response, "jp_app/idea.html", dict)
-   
-### zobrazí stránku s detailem dané položky "nápad" (url: "/idea/<id>", template: "idea.detail.html")
-class IdeaDetailView(DetailView):
-    model = Idea
-    template_name = 'jp_app/idea-detail.html'
-    #template_name = 'idea-detail.html'
-
-### automaticky (pomocí CreateView) načte formulář sloužící k vložení nápadů
-class CreateIdea(CreateView):
-    model = Idea ### models.py
-    form_class = IdeaForm ### forms.py
-    template_name = 'jp_app/idea_add.html' ### pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
-    # template_name = 'jp_app/idea_add.html'
-    # fields = '__all__'
-
-
-class UpdateIdea(UpdateView):
-    model = Idea
-    form_class = IdeaForm  ### forms.py
-    template_name = 'jp_app/idea_update.html' ### pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
-    # fields = '__all__'
-
-
-class DeleteIdea(DeleteView):
-    model = Idea
-    template_name = 'jp_app/idea_delete.html'
-    success_url = reverse_lazy('jp_app:idea') ### 'reverse_lazy' slouží k určení stránky, na kterou po smazání nápadu bude přesměrováno
-
-
-
-
-### GRAFY ###
+### STATISTIKY A GRAFY ###
 
 today = datetime.date.today()
 
-
-def transaction_chart(response):
+### Statistiky skladu ###
+def material_chart(response):
     # template = "jp_app/charts.html"
     # return render(response, template)
     # transaction = Transaction.objects.filter(
@@ -401,6 +412,7 @@ def transaction_chart(response):
     # uloží unikátní dny, ve kterých se uskutečnila transakce (class Transaction)
     q = Transaction.objects.values('day_of_sale').distinct()
     #print(q)
+    global tt
     tt = []
     temp1 = 0
     total = 0
@@ -429,25 +441,39 @@ def transaction_chart(response):
         total += temp  # počítá celkovou utrženou částku za všechny transakce
         temp1 += 1
 
+    tt.sort() ### seřadí list podle datumů vzestupně
+    print(tt)
+    
     #mt_count = mt.count()  # počet položek typ materiálu
     m_count = m.count()  # počet položek materiál
     
     dict = {"t": t, "m": m, "m_count": m_count, "tt":tt}
-    return render(response, "jp_app/charts.html", dict)
+    return render(response, "jp_app/mat-chart.html", dict)
 
 
-def statistic(response):
+### Statistiky a graf s filtrem (využití pandas a matplotlib) ###
+### funkci využívá i fce "stat_chart" pro zobrazení denních, měsíčních a ročních statistik
+### atribut "view=None" se využívá pro účely rozpoznání vyvolatele funkce -> pokud je funkce vyvolána fcí "stat_chart", atribut se změní z None na stat_chart
+def statistic(response, view=None):
+    global df_d
+    df_d = 0
+    global df_m
+    df_m = 0
+    global df_y
+    df_y = 0
+
     form_stat = SearchForm(response.POST or None)
-    date_from = datetime.date(2020, 1, 1)
+    date_from = datetime.date(2021,1,1)
     date_to = today
     qs_tr = None
-    chart = None
-    chart_type = None
+    period = "Months"
+    chart_type = 'Bar chart'
 
     if response.method == "POST":
         date_from = response.POST.get('date_from')
         date_to = response.POST.get('date_to')
         chart_type = response.POST.get('chart_type')
+        period = response.POST.get('period')
 
     qs_tr = Transaction.objects.filter(
         day_of_sale__lte=date_to, day_of_sale__gte=date_from)
@@ -461,7 +487,7 @@ def statistic(response):
         #     lambda x: x.strftime('%a %d.%m.%Y')) ### změní formát data v DataFrame
         df_tr["created"] = df_tr["created"].apply(
             lambda x: x.strftime('%d.%m.%Y'))  ### změní formát data v DataFrame
-               
+            
         df_tr.rename({   ### přejmenuje názvy vybraných sloupců v DataFrame
             "sales_channel_id": "sales_channel",
             "product_id": "produkt",
@@ -475,12 +501,12 @@ def statistic(response):
     df_d = df_tr.groupby('day_of_sale', as_index=False)['total_price'].agg('sum') ### vytvoří DataFrame s celkovými tržbami v jednotlivých dnech
     #df_d = df_d.style.highlight_max(color='red')
     #df_d = df_d.style.hide_index()
+    print('df_d: ',df_d)
     
     ### TVORBA SUMÁŘE TRŽEB DLE MĚSÍCŮ A LET ###
-    
     ### vytvoří nový DataFrame a nastaví správný formát datumů u hodnot ve sloupci "day_of_sale" a umístí ho do indexu tabulky (pro účely dalšího zpracování dat)
     df_m = df_d.set_index(pd.DatetimeIndex(df_d['day_of_sale']), drop=False)
-    ### vytvoří DataFrame se součtem tržeb dle jednotlivých let
+    ### vytvoří nový DataFrame se součtem tržeb dle jednotlivých let
     df_y = df_m.groupby(df_m.index.year.values).sum()
     ### resetuje index -> z indexu obsahující údaj o roku udělá sloupec s názvem "index", jehož údaj se následně bude zobrazovat
     df_y = df_y.reset_index()
@@ -489,32 +515,45 @@ def statistic(response):
     ### přejmenuje indexy, aby se s nimi dalo dále pracovat
     df_m.index.names = ["year_of_sale","month_of_sale"] 
     ### přejmenuje sloupce a z indexů "year_of_sale" a "month_of_sale" udělá sloupce, z jejichž dat se následně zobrazí číslo daného měsíce a rok
-    df_m = df_m.rename(columns={'day_of_sale': 'day', 'total_price': 'price'}).reset_index()
-    ### pomocné printy (možno smazat)
-    print("df_m:", df_m)
-    print("df_y:", df_y)
-
-   
-    #chart = get_chart(chart_type, df_tr)
-    chart_d = get_chart_price_days(
-        chart_type, df_d, labels=df_d['day_of_sale'].values)
+    df_m = df_m.rename(columns={'day_of_sale': 'day'}).reset_index()
+    ### vytvoří nový sloupec se spojeným měsícem a rokem (funkce "str.cat") převedeným na string (funkce "apply") a odděleným "/" (sep="/")
+    df_m['month_year'] = df_m['month_of_sale'].apply(str).str.cat(df_m['year_of_sale'].apply(str), sep="/")
+    ### přeskupí pořadí sloupců, aby byl sloupec 'month_year' jako první pro sjednocení prvního sloupce u df_m/d/y pro účely zobrazení v grafu
+    df_m = df_m[['month_year', 'month_of_sale', 'year_of_sale', 'total_price']]
     
-    chart_m = None #get_chart_price_months(chart_type, df_m, labels=df_m.index.values)
+    ### automaticky zobrazí graf s tržbami po jednotlivých dnech (pokud není funkce vyvolána funkcí "stat_chart", kdy to není třeba)
+    if view != 'stat_chart':
+        chart = get_chart_price(chart_type, df_d, labels=df_d['day_of_sale'].values)
 
-    
+    ### zobrazí konkrétní typ grafu dle požadavku z formuláře, pokud je zadán
+    if response.method == "POST":
+        if "Days" in response.POST['period']:
+            #print("response.POST['period']: ", response.POST['period'])
+            chart = get_chart_price(
+                chart_type, df_d, labels=df_d['day_of_sale'].values)
+        elif "Months" in response.POST['period']:
+            #print("response.POST['period']: ", response.POST['period'])
+            chart = get_chart_price(
+                chart_type, df_m, labels=df_m['month_year'].values)
+        elif "Years" in response.POST['period']:
+            #print("response.POST['period']: ", response.POST['period'])
+            chart = get_chart_price(
+                chart_type, df_y, labels=df_y['index'].values)
+
+    ### sloužilo pro zobrazení tabulek ve formě html, nyní již není třeba, protže se využívá json s ohledem na lepší grafické zobrazení
     #df_tr = df_tr.to_html()
     #df_d = df_d.to_html()
     #df_m = df_m.to_html()
     #df_y = df_y.to_html()
     
-    # json_records_x vyvolá funkci v unit.py, která nastaví správný výstupní fpormát čas (Json)
+    ### json_records_x vyvolá funkci v unit.py, která nastaví správný výstupní fpormát čas (Json)
     json_records_d = get_json(df_d)
     json_records_m = get_json(df_m)
     json_records_y = get_json(df_y)
-    #json_records = df_d.reset_index().to_json(date_format='iso', orient='records')
-    print("json_records_d:", json_records_d)
-    print("json_records_m:", json_records_m)
-    print("json_records_y:", json_records_y)
+
+    # print("json_records_d:", json_records_d)
+    # print("json_records_m:", json_records_m)
+    # print("json_records_y:", json_records_y)
     
     df_m = []
     df_m = json.loads(json_records_m)
@@ -523,18 +562,96 @@ def statistic(response):
     df_y = []
     df_y = json.loads(json_records_y)
 
+    ### v případě chodu funkce vyvolané "stat_chart" ukončí průběh funkce a odešle do fce "stat_chart" data
+    if view == 'stat_chart':
+        return df_d, df_m, df_y
+
 
     dict = {
         "form_stat": form_stat,
-        "df_tr": df_tr,
         "df_d": df_d,
         "df_m": df_m,
         "df_y": df_y,
-        "chart_d": chart_d,
-        "chart_m": chart_m,
-        #"arr": arr,
+        "chart": chart,
     }
     return render(response, "jp_app/statistic.html", dict)
+
+
+### Statistiky s grafy (využití předchozí funkce "statistic" a chart.js) ###
+def stat_chart(response):
+    ### proměnná "a" vyvolá fci "statistic", ze které získá požadované statistiky pro účely jejich zobrazení a vykreslení v grafu na stránce "stat_chart.html"
+    a = statistic(response, 'stat_chart')
+
+    # print('df_d:', df_d)
+    # print('df_m:', df_m)
+    # print('df_y:', df_y)
+
+    dict = {
+        "df_d": df_d,
+        "df_m": df_m,
+        "df_y": df_y,
+    }
+    return render(response, "jp_app/stat_chart.html", dict)
+    
+
+
+
+
+###   NÁPADY   ###
+
+
+### automaticky (pomocí ListView) načte seznam nápadů vložených pomocí "CreateIdea"
+### jednodušší alternativa k řešení pomocí funkcí (viz výše)
+class IdeaView(ListView):
+    model = Idea
+    template_name = 'jp_app/idea/idea.html'
+    ordering = ['-created']  # seřadí seznam nápadů sestupně dle "data vložení"
+
+    ### slouží k sečtení celkového počtu vložených položek "nápady" a následnému zobrazení na stránce
+    def idea(self, response):
+        i = Idea.objects.all()
+
+        i_count = i.count()
+        print(i_count)
+
+        dict = {
+            "i_count": i_count,
+        }
+        return render(response, "jp_app/idea/idea.html", dict)
+
+### zobrazí stránku s detailem dané položky "nápad" (url: "/idea/<id>", template: "idea.detail.html")
+
+
+class IdeaDetailView(DetailView):
+    model = Idea
+    template_name = 'jp_app/idea/idea-detail.html'
+
+### automaticky (pomocí CreateView) načte formulář sloužící k vložení nápadů
+
+
+class CreateIdea(CreateView):
+    model = Idea  # models.py
+    form_class = IdeaForm  # forms.py
+    # pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
+    template_name = 'jp_app/idea/idea_add.html'
+    # template_name = 'jp_app/idea_add.html'
+    # fields = '__all__'
+
+
+class UpdateIdea(UpdateView):
+    model = Idea
+    form_class = IdeaForm  # forms.py
+    # pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
+    template_name = 'jp_app/idea/idea_update.html'
+    # fields = '__all__'
+
+
+class DeleteIdea(DeleteView):
+    model = Idea
+    template_name = 'jp_app/idea/idea_delete.html'
+    # 'reverse_lazy' slouží k určení stránky, na kterou po smazání nápadu bude přesměrováno
+    success_url = reverse_lazy('jp_app:idea')
+
 
 
 

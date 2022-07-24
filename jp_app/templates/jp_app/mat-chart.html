@@ -8,9 +8,10 @@
 
 <br>
 
-<div class="p-3 mb-2 bg-dark text-white">GRAFY</div>
+<div class="p-3 mb-2 bg-dark text-white">SKLADOVÉ ZÁSOBY</div>
 
 <hr>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -31,65 +32,67 @@
         type: 'bar',
         data: data,
         options: {}
+        // responsive slouží k tomu, aby se obraz neklepal(nevýhodou ale je, že grafy nejsou responzivní)
     };
 </script>
 
 
-<div class="row">
-    <div class="col-md-6 col-12">
-        <div class="card" style="margin-top:30px;">
-            <div class="card-body">
-                <h5 class="card-title">Skladové zásoby</h5>
-                <canvas id="myChart" width="300" height="300">
 
-                    <script>
-                        const myChart = new Chart(
-                            document.getElementById('myChart'),
-                            config
-                        );
-                    </script>
-                </canvas>
+<div class="col-sm-6">
+    <div class="card" style="margin-top:30px;">
+        <div class="card-body">
+            <h5 class="card-title">Skladové zásoby</h5>
+            <canvas id="myChart" width="100" height="100">
 
-            </div>
+                <script>
+                    const myChart = new Chart(
+                        document.getElementById('myChart'),
+                        config
+                    );
+                </script>
+            </canvas>
+
         </div>
     </div>
-
-   
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <div class="col-md-6 col-12">
-        <div class="card" style="margin-top:30px;">
-            <div class="card-body">
-                <h5 class="card-title">Tržby</h5>
-                <canvas id="myChartSum" width="300" height="300">
-                    <script>
-                        const dataSum = {
-                                labels: [{% for x, y in tt %} '{{ x|date:"SHORT_DATE_FORMAT" }}', {% endfor %}],
-                            datasets: [{
-                                label: 'Utržená suma (Kč)',
-                                backgroundColor: 'rgb(288, 109, 132)',
-                                borderColor: 'rgb(288, 109, 232)',
-                                data: [{% for x, y in tt %} {{ y }}, {% endfor %}],
-                            }]
-                            };
-
-                        const configSum = {
-                            type: 'bar',
-                            data: dataSum,
-                            options: {}
-                        };
-                        const myChartSum = new Chart(
-                            document.getElementById('myChartSum'),
-                            configSum
-                        );
-                    </script>
-                </canvas>
-
-            </div>
-        </div>
-    </div>
-
 </div>
+
+<!-- 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="col-md-6 col-12">
+    <div class="card" style="margin-top:30px;">
+        <div class="card-body">
+            <h5 class="card-title">Tržby</h5>
+            <canvas id="myChartSum" width="300" height="300">
+                <script>
+                    const dataSum = {
+                            labels: [{% for x, y in tt %} '{{ x|date:"SHORT_DATE_FORMAT" }}', {% endfor %}],
+                        datasets: [{
+                            label: 'Utržená suma (Kč)',
+                            backgroundColor: 'rgb(288, 109, 132)',
+                            borderColor: 'rgb(288, 109, 232)',
+                            data: [{% for x, y in tt %} {{ y }}, {% endfor %}],
+                        }]
+                        };
+
+                    const configSum = {
+                        type: 'bar',
+                        data: dataSum,
+                        options: { responsive: false }
+                        // responsive slouží k tomu, aby se obraz neklepal(nevýhodou ale je, že grafy nejsou responzivní)
+                    };
+                    const myChartSum = new Chart(
+                        document.getElementById('myChartSum'),
+                        configSum
+                    );
+                </script>
+            </canvas>
+
+        </div>
+    </div>
+</div>
+
+</div> -->
 <!-- 
 <<!doctype html>
     <html lang="en">
@@ -244,7 +247,7 @@
             }
         });
     </script>
-<!-- 
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <canvas id="chart" height="90"></canvas>
@@ -275,7 +278,7 @@
         }
     });
 </script>
- --> -->
+ --> 
 
 
 {% endblock %}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<style>
+    span.small {
+  font-size: smaller;
+}
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>
+
+<body>
+
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Product{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<br>
+
+<span class="small">
+
+<div class="p-3 mb-2 bg-dark text-white">PRODUKTY</div>
+
+<div class="p-2 mb-2 bg-info text-black"><strong>Seznam produktů</strong></div>
+<p>Celkový počet položek: {{ object_list.count }}</p>
+<div class="table-responsive">
+<table class="table table-striped table-sm">
+    <thead class="table-info">
+        <tr>
+            <th scope="col">Název produktu</th>
+            <th scope="col">Typ produktu</th>
+            <th scope="col">Obsah produktu</th>
+            <th scope="col">Výrobní náklady ZATÍM NEFUNKČNÍ</th>
+            <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
+            <th scope="col">J&P CANDLES</th>
+            <th scope="col">Poznámky</th>
+            <th scope="col">Přidáno</th>
+            <th scope="col">Editace</th>
+            <th scope="col">Smazání</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in object_list %}
+            <tr>
+                <th scope="row"><a href="{% url 'jp_app:product-detail' post.pk %}">{{ post.name }}</a></th>
+                <td>{{ post.product_type }}</td>
+                <td>{% for item in post.items.all %}{{ item.name }}<br/>{% endfor %}</td>
+                <td>{{ post.production_costs }}</td>
+                <td>{{ post.sold }}</td>
+                <td>{{ post.jp_candles }}</td>
+                <td>{{ post.note }}</td>
+                <td>{{ post.created|date:'d.m.Y' }}</td>
+                <td><a href="{% url 'jp_app:product_update' post.pk %}" class="btn btn-info btn-sm">Editovat</a></td>
+                <td><a href="{% url 'jp_app:product_delete' post.pk %}" class="btn btn-danger btn-sm">Smazat</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</span>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Product{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<br>
+<div class="p-3 mb-2 bg-danger text-white">SMAZÁNÍ PRODUKTU</div>
+
+<hr>
+<p><b>Nápad:</b> {{ idea.name }}</p>
+<p><b>Typ nápadu:</b> {{ idea.product_type }}</p>
+<p><b>Nápad vložen:</b> {{ idea.created }}</p><br><br>
+<div class="form-row align-items-center">
+    <div class="col-auto">
+        <form method="POST">
+            {% csrf_token %}
+            <strong>Opravdu chcete smazat tento nápad?!</strong><br>
+            <button class="btn btn-danger">Smazat</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

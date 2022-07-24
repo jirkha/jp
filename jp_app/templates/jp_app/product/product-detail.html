@@ -1,0 +1,29 @@
+{% extends 'jp_app/base.html' %}
+
+{% block title %}Product{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<br>
+<div class="p-3 mb-2 bg-info text-white">PODROBNOSTI PRODUKTU</div>
+
+<div class="jumbotron">
+    <h1 class="display-4">{{ product.name }}</h1>
+    <p class="lead">Typ pruduktu: <b>{{ product.product_type }}</b></p>
+    <p class="lead">Obsah produktu: <b><br>{% for item in product.items.all %}{{ item.name }} - {{ item.costs }} Kč {% if item.note %}({{item.note}}){% endif %}<br/>{% endfor %}</b></p>
+    <p class="lead">Výrobní náklady: <b>ZATÍM NEFUNKČNÍ{{ product.production_costs }}</b></p>
+    <p class="lead">Prodáno ks (množství): <b>ZATÍM NEFUNKČNÍ{{ product.sold }}</b></p>
+    <p class="lead">J&P CANDLES: <b>{{ product.jp_candles }}</b></p>
+    <p class="lead">Produkt přidán: <b>{{ product.created|date:'d.m.Y' }}</b></p>
+    {% load static %}
+    <img class="card-img-right" src="{% static 'jp_app/DSC00293_2.jpg' %}" alt="Card image cap">
+    <hr class="my-4">
+    <p><b>Poznámky:</b><br>{{ product.note }}</p>
+    <p class="lead">
+        <a class="btn btn-info btn-lg" href="{% url 'jp_app:product_update' product.pk %}" role="button">Editovat</a>
+        <a class="btn btn-danger btn-lg" href="{% url 'jp_app:product_delete' product.pk %}" role="button">Smazat</a>
+    </p>
+</div>
+{% endblock %}
