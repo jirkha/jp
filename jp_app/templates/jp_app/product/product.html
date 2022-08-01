@@ -36,8 +36,8 @@
             <th scope="col">Název produktu</th>
             <th scope="col">Typ produktu</th>
             <th scope="col">Obsah produktu</th>
-            <th scope="col">Výrobní náklady ZATÍM NEFUNKČNÍ</th>
-            <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
+            <th scope="col">Výrobní náklady</th>
+            <th scope="col">Prodáno ks (množství)</th>
             <th scope="col">J&P CANDLES</th>
             <th scope="col">Poznámky</th>
             <th scope="col">Přidáno</th>
@@ -46,19 +46,22 @@
         </tr>
     </thead>
     <tbody>
+        
         {% for post in object_list %}
+ 
             <tr>
                 <th scope="row"><a href="{% url 'jp_app:product-detail' post.pk %}">{{ post.name }}</a></th>
                 <td>{{ post.product_type }}</td>
                 <td>{% for item in post.items.all %}{{ item.name }}<br/>{% endfor %}</td>
-                <td>{{ post.production_costs }}</td>
+                <td>{{ post.production_costs }} Kč</td>
                 <td>{{ post.sold }}</td>
-                <td>{{ post.jp_candles }}</td>
+                <td>{% if post.jp_candles %}Ano{% endif %}{% if not post.jp_candles %}Ne{% endif %}</td>
                 <td>{{ post.note }}</td>
                 <td>{{ post.created|date:'d.m.Y' }}</td>
                 <td><a href="{% url 'jp_app:product_update' post.pk %}" class="btn btn-info btn-sm">Editovat</a></td>
                 <td><a href="{% url 'jp_app:product_delete' post.pk %}" class="btn btn-danger btn-sm">Smazat</a></td>
             </tr>
+  
         {% endfor %}
     </tbody>
 </table>

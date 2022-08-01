@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html>
+<style>
+    span.small {
+  font-size: smaller;
+}
+</style>
+
+<body>
+    
 {% extends 'jp_app/base.html' %}
 
 {% block title %}Product{% endblock %}
@@ -6,7 +16,9 @@
 
 {% block content %}
 
-<br>
+<span class="small">
+
+    <br>
 <div class="p-3 mb-2 bg-info text-white">PRODUKTY</div>
 
 <hr>
@@ -18,8 +30,12 @@
             <p class="card-text">
                 <form method="POST">
                     {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a class="btn btn-outline-light btn-sm" href="/item/" role="button">Přidat ITEM (součást produktu)</a>
+                    </div>
+                    {{ form.media }}
                     {{ form.as_p }}
-                    <button class="btn btn-dark">Přidat</button>
+                    <button class="btn btn-dark">Přidat produkt</button>
                 </form>
             </p>
         </div>
@@ -27,5 +43,6 @@
 </div>
 
 
+</span>
 
 {% endblock %}

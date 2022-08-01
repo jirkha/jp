@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 import datetime
 from datetime import date
+from ckeditor.fields import RichTextField ### importuje textové pole s možností editace textu (velikost písma, barva atd.)
 
 # Create your models here.
 
@@ -22,7 +23,11 @@ class ProductType(models.Model):  # typ produktu
 class Item(models.Model):  # položka (součást) produktu
     name = models.CharField(max_length=256)  # název položky
     # cena za danou součást prduktu (nikoliv za měrnou jednotku, ale za celý produkt
-    costs = models.IntegerField()
+    costs = models.PositiveIntegerField()
+    ### dodavatel dané součásti produktu (firma od které kupuji danou součást)
+    supplier = models.CharField(max_length=256, default=None)
+    ### odkaz na web výrobce/dodavatele dané součásti produktu
+    link = models.URLField(blank=True, null=True, default=None)
     note = models.TextField(blank=True)  # poznámka
     created = models.DateTimeField(auto_now_add=True)
 
@@ -38,6 +43,8 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
     production_costs = models.IntegerField(default=0)  # výrobní náklady, které se spočítají automaticky na základě položek "items"
     # prodaných ks / prodané množství (nezadává se při tvorbě produktu, ale automaticky při transakci)
     sold = models.IntegerField(default=0)
+    ### uvádí postup/technologii výroby (např. recept); RichTextField umožní editaci textu (změna velikosti, barvy písma apod.)
+    procedure = RichTextField(blank=True, null=True, default=None)
     # uvádí (a/n), zda se jedná o výrobek pod značkou J&P CANDLES nebo pod jinou značkou (externí spolupráce)
     jp_candles = models.BooleanField(default=True)
     note = models.TextField(blank=True)  # poznámka
@@ -51,11 +58,16 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"
         return f"{self.name}"
         # umožňuje proklik ze seznamu nápadů na detail daného nápadu
+    
+    # def save(self, *args, **kwargs):
+    #     self.production_costs = self.productsit.costs.values_list()
+    #     print(self.production_costs)
+    #     return super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         # return reverse('idea-detail', args=(str(self.id)))
         return reverse('jp_app:product-detail', args=[self.id])
-
+    
     
 class SaleType(models.Model):  # typ prodejního kanálu
     # název typu prodejního kanálu (# trh / eshop / komisní prodej / kamenný obchod / externí spolupráce apod.)
@@ -89,11 +101,15 @@ class Transaction(models.Model):  # transakce
     product = models.ForeignKey(
         Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
     # prodejní cena za 1 ks / produkt
-    product_price = models.IntegerField(default=0)
-    quantity_of_product = models.IntegerField(default=1)  # množství prodaného produktu
+    product_price = models.PositiveIntegerField(default=0)
+    quantity_of_product = models.PositiveIntegerField(
+        default=1)  # množství prodaného produktu
     total_price = models.IntegerField(blank=True)  # , default=0)
     # automaticky doplní čas přidání transakce
     created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ["day_of_sale"]
 
     def __str__(self):
         return f"{self.product}"
@@ -126,8 +142,9 @@ class Material(models.Model):  # skladový materiál
     type = models.ForeignKey(
         MaterialType, related_name="types", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    quantity_of_material = models.IntegerField(default=0, blank=True) # množství materiálu
-    price = models.IntegerField(default=0, blank=True) # nákupní cena
+    quantity_of_material = models.IntegerField(
+        default=0, blank=True)  # množství materiálu
+    price = models.IntegerField(default=0, blank=True)  # nákupní cena
 
     def __str__(self):
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"
@@ -141,8 +158,9 @@ class Storage(models.Model):  # naskladnění materiálu do skladu
         MaterialType, related_name="material_types", on_delete=models.CASCADE)
     material = models.ForeignKey(
         Material, related_name="materials", on_delete=models.CASCADE)  # přidaný materiál
-    quantity_of_material = models.IntegerField()  # množství přidaného materiálu
-    price = models.IntegerField() # celková cena (nikoliv za jednotku, ale celkem)
+    quantity_of_material = models.PositiveIntegerField()  # množství přidaného materiálu
+    # celková cena (nikoliv za jednotku, ale celkem)
+    price = models.IntegerField()
     shop = models.CharField(max_length=256, blank=True)
     url = models.URLField(blank=True)  # odkaz na produkt
     note = models.TextField(blank=True)  # poznámka
@@ -160,7 +178,8 @@ class Removal(models.Model):  # vyskladnění materiálu ze skladu
         MaterialType, related_name="removal_types", on_delete=models.CASCADE)
     material = models.ForeignKey(
         Material, related_name="removals", on_delete=models.CASCADE)  # vyskladňovaný materiál
-    quantity_of_material = models.IntegerField()  # množství vyskladněného materiálu
+    # množství vyskladněného materiálu
+    quantity_of_material = models.PositiveIntegerField()
     #price = models.IntegerField()  # celková cena (nikoliv za jednotku, ale celkem)
     #shop = models.CharField(max_length=256)
     #url = models.URLField()  # odkaz na produkt

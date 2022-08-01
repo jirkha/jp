@@ -1,21 +1,20 @@
 {% extends 'jp_app/base.html' %}
 
-{% block title %}Product{% endblock %}
+{% block title %}Item{% endblock %}
 
 {% load crispy_forms_tags %}
 
 {% block content %}
 
 <br>
-<div class="p-3 mb-2 bg-info text-white">PRODUKTY</div>
+<div class="p-3 mb-2 bg-info text-white">ITEMS</div>
 
 <hr>
-<h2>Editace produktu</h2>
+<h2>Editace item</h2>
 <div class="form-row align-items-center">
     <div class="col-auto">
         <form method="POST">
             {% csrf_token %}
-            {{ form.media }}
             {{ form.as_p }}
             <button class="btn btn-success">Upravit</button>
         </form>

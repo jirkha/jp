@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'jp_app.apps.JpAppConfig',
     'register.apps.RegisterConfig',
     'django_filters',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -114,9 +115,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'cs'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Prague'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_TZ = True
 
@@ -144,4 +145,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 USE_THOUSAND_SEPARATOR = False # nebude se používat oddělení čárkou mezi tisíci u čísel
 
-DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S'] # '2006-10-25 14:30:59'
+DATETIME_INPUT_FORMATS = ['%d-%m-%Y %H:%M:%S']  # '25-10-2006 14:30:59'

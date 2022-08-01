@@ -30,20 +30,19 @@
 
     <!-- navigační menu (bootstrap) -->
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark">
         <div class="container-fluid">
             
-            <!-- logo J&P Candles -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- logo J&P Candles -->
             <a class="navbar-brand" href="/">
                 <img src="{% static 'jp_app/J&P logo bílé.png' %}" width="70" height="70" alt="My image">
             </a>
             
             <!-- obsah -->
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
@@ -97,7 +96,7 @@
         {% for message in messages %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>            
@@ -140,11 +139,14 @@
     <script src="//cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"></script>
     <script src="//cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="//cdn.datatables.net/1.12.1/js/jquery.dataTables.filter.html.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
 
     <script type="text/javascript">
         console.log("js ready");
         $(document).ready(function () {
             console.log("Jquery ready");
+            $.fn.dataTable.moment( 'YYYY,MM,DD' );
             $('#myTable').dataTable({
                 language: {
                     url: 'http://cdn.datatables.net/plug-ins/1.12.1/i18n/cs.json',
@@ -158,6 +160,7 @@
         console.log("js ready");
         $(document).ready(function () {
             console.log("Jquery ready");
+            $.fn.dataTable.moment( 'YYYY,MM,DD' );
             $('#myTable1').dataTable({
                 language: {
                     url: 'http://cdn.datatables.net/plug-ins/1.12.1/i18n/cs.json',
@@ -171,6 +174,7 @@
         console.log("js ready");
         $(document).ready(function () {
             console.log("Jquery ready");
+            $.fn.dataTable.moment( 'YYYY,MM,DD' );
             $('#myTable2').dataTable({
                 language: {
                     url: 'http://cdn.datatables.net/plug-ins/1.12.1/i18n/cs.json',

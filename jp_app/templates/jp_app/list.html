@@ -98,13 +98,13 @@
                 <tbody>
                     {% for transaction in t %}
                         <tr>
-                            <td>{{ transaction.day_of_sale|date:'d.m.Y' }}</td>
+                            <td>{{ transaction.day_of_sale|safe }}</td>
                             <td>{{ transaction.sales_channel }}</td>
                             <th scope="row"><small>{{ transaction.product }}</small></th>
                             <td>{{ transaction.product_price }}</td>
                             <td>{{ transaction.quantity_of_product }}</td>
                             <td>{{ transaction.total_price }}</td>
-                            <td>{{ transaction.created|date:'d.m.Y H:i:s' }}</td>
+                            <td>{{ transaction.created|safe }}</td>
                             <td><button type="submit" , name="delete_t" , value="{{transaction.id}}" , class="btn btn-danger btn-sm">Delete</button>
                             </td>
                         </tr>
@@ -125,7 +125,7 @@
                 <th scope="col">Typ</th>
                 <th scope="col">Výrobní náklady</th>
                 <th scope="col">J&P CANDLES</th>
-                <th scope="col">Prodáno ks (množství) ZATÍM NEFUNKČNÍ</th>
+                <th scope="col">Prodáno ks (množství)</th>
                 <th scope="col">Vytvořeno</th>
             </tr>
         </thead>
@@ -137,7 +137,7 @@
                     <td>{{ product.production_costs }}</td>
                     <td>{{ product.jp_candles }}</td>
                     <td>{{ product.sold }}</td>
-                    <td>{{ product.created|date:'d.m.Y H:i:s' }}</td>
+                    <td>{{ product.created|safe }}</td>
                 </tr>
             {% endfor %}
         </tbody>

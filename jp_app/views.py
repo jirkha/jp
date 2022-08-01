@@ -1,10 +1,11 @@
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Sum, Count
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from collections import Counter
 
 from .models import ProductType, Product, Item, SaleType, Sale, Transaction
@@ -54,6 +55,23 @@ class ProductView(ListView):
     model = Product
     template_name = 'jp_app/product/product.html'
     ordering = ['-created']  # seřadí seznam produktů sestupně dle "data vložení"
+    
+    ### fce "get_context_data" umožňuje upravovat a přidávat pole/hodnoty v následně zobrazené template u class Views (v tomto případě ListView)
+    ### v tomto případě fce spočítá celkové výrobní náklady z jednotlivých položek "items" obsažených/přiřazených danému produktu
+    def get_context_data(self, **kwargs):
+        ### "context" předdefinovaný (neměnit)
+        context = super(ProductView, self).get_context_data(**kwargs)
+        ### prochází postupně všechny produkty
+        for p in Product.objects.all(): 
+            i_sum=0
+            ### prochází a postupně ukládá ceny ("costs") všech "items" obsažených v daném produktu
+            for i in p.items.values('costs'):
+                i_sum += i['costs']
+            ### uloží do pole "production_costs" daného produktu celkovou částku za všechny "items" a tím vypočítá výrobní náklady daného produktu
+            p.production_costs = i_sum
+            p.save()
+        ### "context" umožní zobrazení nově upraveného pole "production_costs" v template 'jp_app/product/product.html'
+        return context
 
 
 class ProductDetailView(DetailView):
@@ -62,13 +80,16 @@ class ProductDetailView(DetailView):
 
 
 ### automaticky (pomocí CreateView) načte formulář sloužící k vložení produktů
-class CreateProduct(CreateView):
+class CreateProduct(SuccessMessageMixin, CreateView):
+    ### "SuccessMessageMixin" slouží k tomu, aby se po vložení produktu a přesměrování na seznam produktů (k tomu slouží atribut "success_url") mohlo zobrazit potvrzení uložení
     model = Product  # models.py
     form_class = ProductForm  # forms.py
     # pokud kvůli bootstrap mám "template_name", musím zakomentovat "fields"
     template_name = 'jp_app/product/product_add.html'
     # template_name = 'jp_app/idea_add.html'
     # fields = '__all__'
+    success_url = reverse_lazy('jp_app:product') ### po uložení produktu přesměruje na stránku se seznamem produktů
+    success_message = "Produkt %(name)s byl úspěšně uložen" ### po vložení zobrazí upozornění
     
 
 class UpdateProduct(UpdateView):
@@ -84,6 +105,7 @@ class DeleteProduct(DeleteView):
     template_name = 'jp_app/product/product_delete.html'
     # 'reverse_lazy' slouží k určení stránky, na kterou po smazání nápadu bude přesměrováno
     success_url = reverse_lazy('jp_app:product')
+
 
 ### vytvoří a zobrazí seznam "items", tzn. jednotlivých položek, ze kterých se skládají produkty
 def item(response):
@@ -112,6 +134,25 @@ def item(response):
       }
 
     return render(response, "jp_app/product/item.html", dict)
+
+
+### umožní editovat objekt "item"
+def item_update(response, id):
+    item = Item.objects.get(id=id)
+    form = ItemForm(response.POST or None,
+                    instance=item)
+    if form.is_valid():
+        form.save()
+        messages.success(response, ('Item byla úspěšně změněna'))
+        return redirect("/item")
+    
+    dict = {
+        "form": form,
+        "item": item,
+    }
+    
+    return render(response, "jp_app/product/item_update.html", dict)
+
 
 
 ### zobrazí všechny položky kategorie prodej ###
@@ -158,8 +199,27 @@ def list(response):
         temp1 += 1
     #print(tt)
 
-    print(p)
-    print(Product.objects.values_list('name','items'))
+
+    ### vypočte, kolik bylo prodáno ks jednotlivých výrobků (z uskutečněných transakcí) ###
+    id_p = Product.objects.values('id')
+    ### prochází jednotlivé výrobky dle "id"
+    for product in id_p:
+        # print("id_p:", id_p)
+        # print("product['id']:", product['id'])
+        ### z trasakcí seskupených dle "id" prodaného výrobku vypočte celkový počet prodaných ks daného výrobku
+        y = Transaction.objects.filter(product__id=product['id']).values(
+            'product').annotate(sum=Sum('quantity_of_product')).values('sum')
+        ### "z1" je list_comprehension, jehož výsledkem je ale list, proto se zatám nepoužívá a místo toho je níže "for z in y", které z QuerySetu vyndá počet prodaných výrobků pro další použití
+        # z1 = ([z['sum'] for z in y])
+        # print("z1:",z1)
+        for z in y:
+            ### najde produkt, který je aktuálně součástí daného cyklu "for product in id_p"
+            pr1 = Product.objects.get(id=product['id'])
+            ### k danému atributu "sold" daného produktu přiřadí počet prodaných ks a uloží ho
+            pr1.sold = z['sum']
+            pr1.save()
+
+    print(t.values('day_of_sale'))
     
     ### tato část slouží k filtrování transakcí ###
     myFilter = TransactionFilter(response.GET, queryset=t) 
@@ -607,17 +667,17 @@ class IdeaView(ListView):
     template_name = 'jp_app/idea/idea.html'
     ordering = ['-created']  # seřadí seznam nápadů sestupně dle "data vložení"
 
-    ### slouží k sečtení celkového počtu vložených položek "nápady" a následnému zobrazení na stránce
-    def idea(self, response):
-        i = Idea.objects.all()
+    # ### slouží k sečtení celkového počtu vložených položek "nápady" a následnému zobrazení na stránce
+    # def idea(self, response):
+    #     i = Idea.objects.all()
 
-        i_count = i.count()
-        print(i_count)
+    #     i_count = i.count()
+    #     print(i_count)
 
-        dict = {
-            "i_count": i_count,
-        }
-        return render(response, "jp_app/idea/idea.html", dict)
+    #     dict = {
+    #         "i_count": i_count,
+    #     }
+    #     return render(response, "jp_app/idea/idea.html", dict)
 
 ### zobrazí stránku s detailem dané položky "nápad" (url: "/idea/<id>", template: "idea.detail.html")
 

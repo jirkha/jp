@@ -26,22 +26,33 @@ class ProductTypeForm(ModelForm):
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ["name", "product_type", "items", "jp_candles", "note"]
+        fields = ["name", "product_type", "items",
+                  "jp_candles", "procedure", "note"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název produktu'}),
             'product_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
-            'items': forms.SelectMultiple(attrs={'class': 'form-control form-control-sm'}),
+            'items': forms.SelectMultiple(attrs={'class': 'form-control form-control-sm chosen', 'size': 10}),
             'jp_candles': forms.NullBooleanSelect(attrs={'class': 'form-control form-control-sm'}),
+            'procedure': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Zde přidejte postup výroby, recept apod.'}),
             'note': forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
         }
         
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = ["name", "costs", "note"]
+        fields = ["name", "costs", "supplier", "link", "note"]
+        labels = {
+            'name': ('Položka'),
+            'costs': ('Cena'),
+            'supplier': ('Dodavatel'),
+            'link': ('Odkaz'),
+            'note': ('Poznámka'),
+            }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název položky'}),
+            'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název položky', 'title': 'Your name'}),
             'costs': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Cena za položku (celkem)'}),
+            'supplier': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název dodavatele položky (obchodu)'}),
+            'link': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': "Odkaz na dodavatele (nutno zadat ve formátu 'www.dodavatel.cz')"}),
             'note': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 1, 'cols': 1, 'placeholder': 'Poznámka (volitelné)'}),
         }
 

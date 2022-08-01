@@ -13,14 +13,14 @@
     <h1 class="display-4">{{ product.name }}</h1>
     <p class="lead">Typ pruduktu: <b>{{ product.product_type }}</b></p>
     <p class="lead">Obsah produktu: <b><br>{% for item in product.items.all %}{{ item.name }} - {{ item.costs }} Kč {% if item.note %}({{item.note}}){% endif %}<br/>{% endfor %}</b></p>
-    <p class="lead">Výrobní náklady: <b>ZATÍM NEFUNKČNÍ{{ product.production_costs }}</b></p>
-    <p class="lead">Prodáno ks (množství): <b>ZATÍM NEFUNKČNÍ{{ product.sold }}</b></p>
-    <p class="lead">J&P CANDLES: <b>{{ product.jp_candles }}</b></p>
+    <p class="lead">Výrobní náklady: <b>{{ product.production_costs }} Kč</b></p>
+    <p class="lead">Prodané množství: <b>{{ product.sold }} ks</b></p>
+    <p class="lead">J&P CANDLES: <b>{% if post.jp_candles %}Ano{% endif %}{% if not post.jp_candles %}Ne{% endif %}</b></p>
     <p class="lead">Produkt přidán: <b>{{ product.created|date:'d.m.Y' }}</b></p>
-    {% load static %}
-    <img class="card-img-right" src="{% static 'jp_app/DSC00293_2.jpg' %}" alt="Card image cap">
     <hr class="my-4">
-    <p><b>Poznámky:</b><br>{{ product.note }}</p>
+    <p class="lead">Postup přípravy produktu: {{ product.procedure|safe }}</p>
+    <hr class="my-4">
+    <p>Poznámky:<br>{{ product.note }}</p>
     <p class="lead">
         <a class="btn btn-info btn-lg" href="{% url 'jp_app:product_update' product.pk %}" role="button">Editovat</a>
         <a class="btn btn-danger btn-lg" href="{% url 'jp_app:product_delete' product.pk %}" role="button">Smazat</a>
