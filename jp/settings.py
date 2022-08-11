@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'jp_app.apps.JpAppConfig',
+    'to_do_list.apps.ToDoListConfig',
     'register.apps.RegisterConfig',
     'django_filters',
     'ckeditor',
@@ -117,7 +118,7 @@ LANGUAGE_CODE = 'cs'
 
 TIME_ZONE = 'Europe/Prague'
 
-USE_I18N = False
+USE_I18N = True
 
 USE_TZ = True
 
@@ -146,3 +147,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 USE_THOUSAND_SEPARATOR = False # nebude se používat oddělení čárkou mezi tisíci u čísel
 
 DATETIME_INPUT_FORMATS = ['%d-%m-%Y %H:%M:%S']  # '25-10-2006 14:30:59'
+DATE_INPUT_FORMATS = ['%d-%m-%Y']

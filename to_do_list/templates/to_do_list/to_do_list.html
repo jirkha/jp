@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<style>
+    span.small {
+  font-size: smaller;
+}
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>
+
+<body>
+
+{% extends 'jp_app/base.html' %}
+
+{% block title %}
+ToDoList
+{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<br>
+<div class="p-3 mb-2 bg-info text-white">To Do List</div>
+
+<form method="post" action="/to_do_list/" class="row">
+  {% csrf_token %}
+
+  <div class="col-sm-6">
+    <label class="visually-hidden" for="autoSizingInputGroup">Name</label>
+    <div class="input-group mb-3">
+      <div class="input-group-text">Úkol</div>
+      <input type="text" class="form-control" name="name" id="autoSizingInputGroup">
+    </div>
+    
+    <label class="visually-hidden" for="datepicker">Date</label>
+    <div class="input-group mb-3 date" id="datepicker">
+        <input type="text" class="form-control" name="date" placeholder="Vyberte datum - termín úkolu">
+        <span class="input-group-append">
+            <span class="input-group-text bg-white d-block">
+                <i class="fa fa-calendar"></i>
+            </span>
+        </span>
+    </div>
+
+    <script type="text/javascript">
+        $(function() {
+            $('#datepicker').datepicker(
+                {
+                    orientation: "bottom",
+                    weekStart: 0,
+                    rtl: true,
+                    language: 'cs-CZ',
+                    format: 'yyyy-mm-dd',
+                    
+                  
+                }
+            );
+        });
+    </script>
+  </div>
+  <div class="col-sm-6">
+    <label class="visually-hidden" for="autoSizingInputGroup2">Content</label>
+    <div class="input-group">
+        <div class="input-group-text">Obsah</div>
+        <textarea class="form-control" name="content" placeholder="Obsah úkolu (nepovinné)" id="autoSizingInputGroup2" style="height: 90px"></textarea>
+    </div>
+  </div>
+
+  <div class="col-sm-6">
+    <div class="form-check">
+        <input class="form-check-input" name="checked" type="checkbox" id="gridCheck">
+        <label class="form-check-label" for="gridCheck">
+        Hotovo
+        </label>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <button type="submit" name="add" class="btn btn-info btn-rounded">Uložit</button>
+  </div>
+</form>
+
+{% comment %} Seznam položek ToDoList {% endcomment %}
+<hr>
+
+<div class="table-responsive">
+<table class="table table-striped table-sm">
+    <thead class="table-info">
+        <tr>
+            <th scope="col">Hotovo</th>
+            <th scope="col">Název</th>
+            <th scope="col">Obsah</th>
+            <th scope="col">Termín</th>
+            <th scope="col">Vytvořeno</th>
+            <th scope="col">Editace</th>
+            <th scope="col">Smazat</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        {% for item in t %}
+            <tr>
+               
+                <td>{% if item.checked %}Ano{% endif %}{% if not item.checked %}{% endif %}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.content }}</td>
+                <td>{{ item.date }}</td>
+                <td>{{ item.created|date:'d.m.Y H:i:s' }}</td>
+                {% comment %} <td><a href="{% url 'jp_app:product_update' post.pk %}" class="btn btn-info btn-sm">Editovat</a></td>
+                <td><a href="{% url 'jp_app:product_delete' post.pk %}" class="btn btn-danger btn-sm">Smazat</a></td> {% endcomment %}
+            </tr>
+  
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</body>
+
+{% endblock %}
