@@ -23,9 +23,14 @@ ToDoList
 
 {% block content %}
 
+<span class="small">
+
 <br>
 <div class="p-3 mb-2 bg-info text-white">To Do List</div>
 
+{% comment %} Formulář pro přidání položky ToDoListu {% endcomment %}
+<div class="card border-info mb-3">
+<div class="card-body">
 <form method="post" action="/to_do_list/" class="row">
   {% csrf_token %}
 
@@ -33,7 +38,7 @@ ToDoList
     <label class="visually-hidden" for="autoSizingInputGroup">Name</label>
     <div class="input-group mb-3">
       <div class="input-group-text">Úkol</div>
-      <input type="text" class="form-control" name="name" id="autoSizingInputGroup">
+      <input type="text" class="form-control" name="name" placeholder="Název úkolu" id="autoSizingInputGroup">
     </div>
     
     <label class="visually-hidden" for="datepicker">Date</label>
@@ -82,10 +87,14 @@ ToDoList
     <button type="submit" name="add" class="btn btn-info btn-rounded">Uložit</button>
   </div>
 </form>
+</div>
+</div>
 
 {% comment %} Seznam položek ToDoList {% endcomment %}
 <hr>
 
+<form method="post" action="#">
+{% csrf_token %}
 <div class="table-responsive">
 <table class="table table-striped table-sm">
     <thead class="table-info">
@@ -106,18 +115,21 @@ ToDoList
                
                 <td>{% if item.checked %}Ano{% endif %}{% if not item.checked %}{% endif %}</td>
                 <td>{{ item.name }}</td>
-                <td>{{ item.content }}</td>
+                <td>{{ item.content|safe }}</td>
                 <td>{{ item.date }}</td>
                 <td>{{ item.created|date:'d.m.Y H:i:s' }}</td>
-                {% comment %} <td><a href="{% url 'jp_app:product_update' post.pk %}" class="btn btn-info btn-sm">Editovat</a></td>
-                <td><a href="{% url 'jp_app:product_delete' post.pk %}" class="btn btn-danger btn-sm">Smazat</a></td> {% endcomment %}
+                <td><a href="{% url 'to_do_list:to_to_list_update' item.id %}" class="btn btn-info btn-sm">Editovat</a></td>
+                <td><button type="submit" , name="delete_t" , value="{{item.id}}" , class="btn btn-danger btn-sm">Smazat</button></td>
             </tr>
   
         {% endfor %}
     </tbody>
 </table>
 </div>
+</form>
 
 </body>
+
+</span>
 
 {% endblock %}

@@ -1,0 +1,1 @@
+web : gunicorn jp.wsgi

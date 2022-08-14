@@ -1,6 +1,6 @@
 from django import forms
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.db.models import Sum, Count
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -25,7 +25,6 @@ from .utils import (
     get_json,
 )
     
-
 import datetime
 import pandas as pd
 import json
@@ -35,6 +34,16 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os
 
+### pdf creator
+import csv
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+
+from django.template.loader import render_to_string
+from io import BytesIO
+from xhtml2pdf import pisa
 
 
 ###   PRODEJ   ###
@@ -55,6 +64,7 @@ class ProductView(ListView):
     model = Product
     template_name = 'jp_app/product/product.html'
     ordering = ['-created']  # seřadí seznam produktů sestupně dle "data vložení"
+    paginate_by = 15 ### pokud bude mít seznam více než  15 položek, rozdělí se v teplate na více stránek
     
     ### fce "get_context_data" umožňuje upravovat a přidávat pole/hodnoty v následně zobrazené template u class Views (v tomto případě ListView)
     ### v tomto případě fce spočítá celkové výrobní náklady z jednotlivých položek "items" obsažených/přiřazených danému produktu
@@ -736,3 +746,30 @@ def google(response):
     
     dict = {}
     return render(response, "jp_app/google.html", dict)
+
+
+
+
+### PDF ####
+
+### https://thecodelearners.com/django-tutorial-on-pdf-generation-and-rendering-with-xhtml2pdf-package/
+def render_pdf(request):
+    path = "jp_app/pdf/pdf_template.html"
+    print(path)
+    context = {"product": Product.objects.all()[:100]}
+
+    html = render_to_string('jp_app/pdf/pdf_template.html', context)
+    #html = render_to_string('templates/jp_app/pdf/pdf_template', context)
+    io_bytes = BytesIO()
+
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), io_bytes)
+    
+    response = HttpResponse(io_bytes.getvalue(),
+                            content_type='application/jp_app')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+
+    if not pdf.err:
+        return response
+    else:
+        return HttpResponse("Error while rendering PDF", status=400)
+

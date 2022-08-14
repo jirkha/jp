@@ -53,6 +53,8 @@ class Product(models.Model): # prudukt (výrobek k prodeji)
 
     class Meta:
         ordering = ["created"]
+        managed = True
+        db_table = 'product'
 
     def __str__(self):
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"

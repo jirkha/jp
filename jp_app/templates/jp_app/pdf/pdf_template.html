@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Django PDF</title>
+    <style>
+        th, td{
+            padding: 5px 15px;
+        }
+        th{
+            font-size: 20px;
+            font-weight: bold;
+        }
+        td{
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;" >List of States by respective Countries</h1>
+
+    <table border="1" style="border-collapse: collapse;" >
+        <thead>
+            <tr>
+                <td>Country Name</td>
+                <td>Country Short Code</td>
+                <td>State Name</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for value in product %}
+                <tr>
+                    <td>{{value.name}}</td>
+                    <td>{{value.product_type}}</td>
+                    <td>{{value.created}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>            
+</body>
+</html>
+

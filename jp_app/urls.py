@@ -32,6 +32,9 @@ urlpatterns = [
     
     path("google/", views.google, name="google"),
     
+    path("render_pdf/",
+         views.render_pdf, name="render_pdf"),
+    
     path("idea/", IdeaView.as_view(), name="idea"),
     path("idea/<int:pk>", IdeaDetailView.as_view(), name="idea-detail"),
     path("idea_update/<int:pk>", UpdateIdea.as_view(), name="idea_update"),

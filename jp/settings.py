@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 from django.conf.global_settings import DATETIME_INPUT_FORMATS
+import django_heroku
+import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#w=zp*)&42$f=f(^s=uqtlw4(j@4be=wkj-zlu&^rgka7ux57)'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -54,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'jp.urls'
@@ -83,10 +87,10 @@ WSGI_APPLICATION = 'jp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'jp_candles',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'NAME': config('NAME'),
+        'USER': config('USER'),
+        'PASSWORD': config('PASSWORD'),
+        'HOST': config('HOST'),
         'PORT': '5432',
     }
 }
@@ -132,6 +136,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "jp_app/static",
 ]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATIC_URL = 'static/'
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -148,3 +154,5 @@ USE_THOUSAND_SEPARATOR = False # nebude se používat oddělení čárkou mezi t
 
 DATETIME_INPUT_FORMATS = ['%d-%m-%Y %H:%M:%S']  # '25-10-2006 14:30:59'
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
+
+django_heroku.settings(locals())
