@@ -103,9 +103,8 @@ class Transaction(models.Model):  # transakce
     product = models.ForeignKey(
         Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
     # prodejní cena za 1 ks / produkt
-    product_price = models.PositiveIntegerField(default=0)
-    quantity_of_product = models.PositiveIntegerField(
-        default=1)  # množství prodaného produktu
+    product_price = models.PositiveIntegerField()
+    quantity_of_product = models.PositiveIntegerField()  # množství prodaného produktu
     total_price = models.IntegerField(blank=True)  # , default=0)
     # automaticky doplní čas přidání transakce
     created = models.DateTimeField(auto_now_add=True)

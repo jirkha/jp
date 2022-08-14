@@ -289,7 +289,6 @@ def create(response):
                 form_s.save()
         elif "save_t" in response.POST: ### transakce
             form_t = TransactionForm(response.POST)
-            print(form_t.is_valid())
             #d = form_t.cleaned_data["day_of_sale"]
             #s = form_t.cleaned_data["sales_channel"]
             #p = form_t.cleaned_data["product"]
@@ -406,8 +405,7 @@ def material(response):
     form_m = MaterialForm()
     form_st = StorageForm()
     form_r = RemovalForm()
-    dict = {"form_mt": form_mt, "form_m": form_m,
-            "form_st": form_st, "form_r": form_r}
+
     if response.method == "POST":
         if "save_mt" in response.POST: ### typ skladové položky (materiálu)
             form_mt = MaterialTypeForm(response.POST)
@@ -416,7 +414,6 @@ def material(response):
         elif "save_m" in response.POST: ### materiál
             form_m = MaterialForm(response.POST)
             if form_m.is_valid():
-                print(response.POST)
                 form_m.save()
         elif "save_st" in response.POST: ### naskladnění
             form_st = StorageForm(response.POST)
@@ -451,9 +448,8 @@ def material(response):
         else:
             pass
     
-    # for item in form_st:
-        
-    #     print()        
+    dict = {"form_mt": form_mt, "form_m": form_m,
+            "form_st": form_st, "form_r": form_r}
 
     return render(response, "jp_app/material.html", dict)
 

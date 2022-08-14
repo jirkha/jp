@@ -6,6 +6,7 @@ from jp_app.models import Idea
 
 import datetime
 from datetime import date
+from ckeditor.widgets import CKEditorWidget
 
 
 ###   PRODEJ   ###
@@ -28,12 +29,21 @@ class ProductForm(ModelForm):
         model = Product
         fields = ["name", "product_type", "items",
                   "jp_candles", "procedure", "note"]
+        procedure = forms.CharField(widget=CKEditorWidget())
+        labels = {
+            'name': ('Název produktu'),
+            'product_type': ('Typ produktu'),
+            'items': ('Obsah produktu (nepovinné)'),
+            'jp_candles': ('J&P CANDLES'),
+            'procedure': ('Postup výroby (nepovinné)'),
+            'note': ('Poznámka (nepovinné)'),
+        }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Název produktu'}),
             'product_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
             'items': forms.SelectMultiple(attrs={'class': 'form-control form-control-sm chosen', 'size': 10}),
             'jp_candles': forms.NullBooleanSelect(attrs={'class': 'form-control form-control-sm'}),
-            'procedure': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Zde přidejte postup výroby, recept apod.'}),
+            #'procedure': forms.CharField(widget=RichTextWidget()) #forms.RichTextWidget(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Zde přidejte postup výroby, recept apod.'}),
             'note': forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
         }
         
@@ -79,9 +89,20 @@ class TransactionForm(ModelForm):
         model = Transaction
         fields = ["day_of_sale", "sales_channel",
                   "product", "product_price", "quantity_of_product"]
-        widgets = {'day_of_sale': DateInput()}
-        #fields = '__all__'
-
+        labels = {
+            'day_of_sale': ('Den prodeje'),
+            'sales_channel': ('Prodejní kanál'),
+            'product': ('Produkt'),
+            'product_price': ('Cena produktu'),
+            'quantity_of_product': ('Množství produktu'),
+        }
+        widgets = {
+            'day_of_sale': DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Vyberte datum', 'title': 'Datum naskladnění'}),
+            'sales_channel': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'product': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'product_price': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Jednotková cena za 1ks'}),
+            'quantity_of_product': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
+        }
 
 
 ### slouží k filtrování prodaných položek dle data a následnému zobrazení v grafech
@@ -124,15 +145,46 @@ class StorageForm(ModelForm):
     class Meta:
         model = Storage
         fields = '__all__'
-        widgets = {'day_of_storage': DateInput()}
+        labels = {
+            'day_of_storage': ('Datum naskladnění'),
+            'material_type': ('Typ materiálu'),
+            'material': ('Materiál'),
+            'quantity_of_material': ('Množství materiálu'),
+            'price': ('Cena'),
+            'shop': ('Dodavatel (volitelné)'),
+            'url': ('Odkaz (volitelné)'),
+            'note': ('Poznámka (volitelné)'),
+        }
+        widgets = {
+            'day_of_storage': DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Vyberte datum', 'title': 'Datum naskladnění'}),
+            'material_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'material': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'quantity_of_material': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Množství v ks / kg', 'title': 'Množství materiálu'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Celková cena', 'title': 'Cena'}),
+            'shop': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'název dodavatele či obchodu', 'title': 'Dodavatel (volitelné)'}),
+            'url': forms.URLInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'www.abc.cz (web dodavatele či materiálu)', 'title': 'Odkaz (volitelné)'}),
+            'note': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 3, 'cols': 1, 'title': 'Poznámka (volitelné)'}),
+        }
 
 
 class RemovalForm(ModelForm):
     class Meta:
         model = Removal
         fields = '__all__'
-        widgets = {'day_of_removal': DateInput()}
-
+        labels = {
+            'day_of_removal': ('Datum vyskladnění'),
+            'material_type': ('Typ materiálu'),
+            'material': ('Materiál'),
+            'quantity_of_material': ('Množství materiálu'),
+            'note': ('Poznámka (volitelné)'),
+        }
+        widgets = {
+            'day_of_removal': DateInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Vyberte datum', 'title': 'Datum naskladnění'}),
+            'material_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'material': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'quantity_of_material': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Množství v ks / kg', 'title': 'Množství materiálu'}),
+            'note': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 10, 'cols': 1, 'title': 'Poznámka (volitelné)'}),
+        }
 
 
 ###   NÁPADY   ###
